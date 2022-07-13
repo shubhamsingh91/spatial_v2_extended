@@ -4,13 +4,19 @@ classdef RBD_model
     properties
         parent 
         NB % TODO - global change to NJ?
+        NL
         NV
         NQ
         N_RB % number of rigid bodies
         I 
+        Il
+        Ir
+        I_RB
         gravity
         appearance
         Xtree
+        XtreeKin
+        XtreeKinRot
         joint
         qinds
         vinds
