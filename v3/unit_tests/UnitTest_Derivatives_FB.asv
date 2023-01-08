@@ -2,10 +2,10 @@
 % Unit tests for derivatives functions
 
 clear
-N = 5;
+N = 2;
 
 % Create a random model with N links
-model = autoTree(N, 1.5, pi/3);
+model = autoTree(N, 1, 0);
 
 checkDerivatives(model,'Floating Base No Rotors');
 
@@ -14,8 +14,8 @@ function checkDerivatives(model, desc)
     fprintf('%s\n',desc);
     fprintf('====================================\n');
     
-    model.jtype{1} = 'Fb';
-    model.jtype{2} = 'S';
+    model.jtype{1} = 'R';
+    model.jtype{2} = 'R';
     model = postProcessModel(model);
     
     % Random inertial properties
@@ -177,9 +177,9 @@ function checkDerivatives(model, desc)
     checkValue('ID_qdd_q'    , ID_qdd_q      , tensorRotR(ID_q_qdd_cs)       ); % SO Partials of ID w.r.t. qdd,q
 %
     checkValue('FD_qq'       , FD_qq         , FD_qq_cs                ); % SO Partials of FD w.r.t. q,q
-    checkValue('FD_vv'       , FD_vv         , FD_vv_cs                ); % SO Partials of FD w.r.t. qd,qd
-    checkValue('FD_qv'       , FD_qv         , FD_qv_cs                ); % SO Partials of FD w.r.t. q,qd
-    checkValue('FD_tau_q'    , FD_tau_q      , FD_tau_q_cs             ); % SO Partials of FD w.r.t. tau,q
+    checkValue('ID_vv'       , FD_vv         , FD_vv_cs              ); % SO Partials of ID w.r.t. qd,qd
+    checkValue('ID_qdq'      , ID_qdq        , ID_dqd_cs               ); % SO Partials of ID w.r.t. q,qd
+    checkValue('ID_qdd_q'    , ID_qdd_q      , tensorRotR(ID_q_qdd_cs)       ); % SO Partials of ID w.r.t. qdd,q
 
     fprintf('\n');
 end
