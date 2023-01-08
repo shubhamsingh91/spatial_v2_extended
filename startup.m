@@ -18,4 +18,10 @@
 %     startup.m in that directory, then simply add the (edited) line
 %     below to that file.
 
-addpath( genpath( '/home/users/roy/booksoft/spatial_v2' ) );
+%addpath( genpath( '/home/users/roy/booksoft/spatial_v2' ) );
+
+
+% Determine where your m-file's folder is.
+folder = fileparts(which(mfilename)); 
+% % Add that folder plus all subfolders to the path.
+addpath(genpath(folder));
