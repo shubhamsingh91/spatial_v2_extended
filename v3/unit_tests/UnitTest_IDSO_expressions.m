@@ -1,5 +1,6 @@
-clc; clear all;
+% Unit tests for ID SO expressions
 
+clear
 N = 5;
 
 % Create a random model with N links
@@ -69,12 +70,12 @@ for ii=1:model.NB
         if (ismember(kk,model.ancestors{jj})&&ismember(jj,model.ancestors{ii}))                                % k<=j<=i
            fprintf("\n ii = % d; jj= %d; kk= %d  \n \n",ii,jj,kk)              
  
-            out_ana.SO_q_1 = -rotT( mT(psidj.',rotR(Tm(2*BIic_Si,psidk))))-...
-                     rotT(mT(2*Sj.',rotR(Tm(cmf_barM(BCi.'*Si),psidk))))-...
-                     rotT(mT(Sj.',rotR(Tm(cmf_barM(ICi*Si),psiddk))) );                                        % SO q -1
+            out_ana.SO_q_1 = -rotT( mT(psidj.',rotR(Tm(2*BIic_Si,psidk)))+...
+                     mT(2*Sj.',rotR(Tm(cmf_barM(BCi.'*Si),psidk)))+...
+                     mT(Sj.',rotR(Tm(cmf_barM(ICi*Si),psiddk))));                                              % SO q -1
             out_ana.SO_vq_1 = -rotT(mT(Sj.',rotR(Tm(2*BIic_Si,psidk))));                                       % SO vq -1   
             out_ana.MFO_1 = zeros(nj,ni,nk);                                                                   % M FO -1  
-            out_ana.MFO_2 = zeros(ni,nj,nk);                                                                   % M FO -1 
+            out_ana.MFO_2 = zeros(ni,nj,nk);                                                                   % M FO -2 
             
             run_comp({'q-1','vq-1','MFO-1','MFO-2'},out_cs,out_ana);
                  
@@ -111,7 +112,7 @@ for ii=1:model.NB
            end
            
            if jj~=ii                                                                                           % k<=j<i
-            out_ana.SO_q_5 = mT(2*Sj.',Tm(BIic_psidi+A1,psidk))+ mT(Sj.',Tm(A2,psiddk));                       % SO q -5
+            out_ana.SO_q_5 = mT(Sj.',2*Tm(BIic_psidi+A1,psidk)+ Tm(A2,psiddk));                                % SO q -5
             out_ana.SO_q_6 = rotR(out_ana.SO_q_5);                                                             % SO q -6
             out_ana.SO_v_7 = mT(Sj.',Tm(2*BIic_Si,Sk));                                                        % SO v -7
             out_ana.SO_v_8 = rotR(out_ana.SO_v_7);                                                             % SO v -8

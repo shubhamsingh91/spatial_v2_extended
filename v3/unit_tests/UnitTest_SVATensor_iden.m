@@ -1,12 +1,11 @@
-clc; clear all;
+% Unit tests for SVA Tensor identites 
 
-
+clear
 N = 5;
 
 % Create a random model with N links
 model = autoTree(N, 1.5, pi/3);
 checkSVATensor_iden(model,'Floating Base No Rotors');
-
 
 function checkSVATensor_iden(model, desc)
 fprintf('====================================\n');

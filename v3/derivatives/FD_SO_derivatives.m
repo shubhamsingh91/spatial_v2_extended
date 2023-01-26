@@ -3,9 +3,14 @@ function [derivs] = FD_SO_derivatives(model,q, qd,qdd)
 [tau]      = ID(model, q ,qd ,qdd);                                        % Inverse dynamics
 [dqdd_dq, dqdd_dv,~] = FD_derivatives( model, q, qd, tau );        % FD FO derivatives
 
-[d2tau_dq, d2tau_dv, ddtau_dqv,M_FO] = ...
-            ID_SO_derivatives_v7_pin_v5(model, q, qd,qdd);                 % ID SO derivatives
+derivs_IDSO =  ID_SO_derivatives(model, q, qd,qdd);                   % ID SO derivatives
         
+d2tau_dq=derivs_IDSO.d2tau_dq;
+d2tau_dv=derivs_IDSO.d2tau_dqd;
+ddtau_dqv=derivs_IDSO.d2tau_cross;
+M_FO=derivs_IDSO.dM_dq;
+
+
 Hinv = Hinverse( model, q);                                                % Minv
 
 derivs.d2FD_dq = mT(-Hinv,d2tau_dq+Tm(M_FO,dqdd_dq)+rotR(Tm(M_FO,dqdd_dq)));
