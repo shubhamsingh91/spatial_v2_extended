@@ -27,7 +27,8 @@ end
 
 qd = rand(model.NV,1);
 qdd=rand(model.NV,1);
-
+m6 = rand(6,1); % random 6-motion vector
+f6 = rand(6,1); %random 6-force vector
 
 %% complex-step
 
@@ -38,7 +39,7 @@ newConfig = @(x) configurationAddition(model,q,x);
         complexStepHessian(@(x) ID_derivatives(model, q ,x ,qdd) , qd);
 out_cs.M_FO = complexStepJacobian_MFO(@(x) CRBA(model,  newConfig(x)), zeros(model.NV,1));
 
-[glob,bod] = GlobalDynamics( model, q, qd, qdd);
+[glob,bod] = GlobalDynamics( model, q, qd, qdd,m6,f6);
 
 fprintf('Running all possible cases for i,j,k \n')
 

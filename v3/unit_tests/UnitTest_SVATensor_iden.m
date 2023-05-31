@@ -25,24 +25,27 @@ end
 
 qd = rand(model.NV,1);
 qdd=rand(model.NV,1);
+m6 = rand(6,1); % random 6-motion vector
+f6 = rand(6,1); %random 6-force vector
 
 %%
 step=1e-20; % step size for complex-step
 
 newConfig = @(x) configurationAddition(model,q,x);
-[glob,bod] = GlobalDynamics( model, q, qd, qdd);
+[glob,bod] = GlobalDynamics( model, q, qd, qdd,m6,f6);
 % For all possible ii and jj cases
 
 for ii=1:model.NB                           
      for jj=1:ii
 
         ni = model.nv(ii); nj = model.nv(jj);
+        p = randi([1,nj]); % 1 random single mode of joint-j
 
         [glob_cs_q] = perturbIndex_q(model,@(x) GlobalDynamics(model, newConfig(x) ...
-            ,qd ,qdd), zeros(model.NV,1),jj,ii );                                                        % complex with perturb q
+            ,qd ,qdd,m6,f6), zeros(model.NV,1),jj,ii,p );                                                        % complex with perturb q
 
         glob_cs_v = perturbIndex_v(model,@(x) GlobalDynamics(model, q ...
-            ,x ,qdd), qd,jj,ii );                                                                        % complex with perturb v
+            ,x ,qdd,m6,f6), qd,jj,ii );                                                                        % complex with perturb v
 
                                                                                                          % glob coordinates
         Si_g = glob.S{ii};       psidi_g = glob.psid{ii};  vi_g = glob.v{ii};      ai_g = glob.a{ii};

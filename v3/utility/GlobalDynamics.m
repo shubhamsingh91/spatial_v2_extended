@@ -1,4 +1,4 @@
-function  [glob, bod] = GlobalDynamics( model, q, qd, qdd)
+function  [glob, bod] = GlobalDynamics( model, q, qd, qdd,m6,f6)
 skew  = @(x) [ 0 -x(3) x(2) ; x(3) 0 -x(1) ; -x(2) x(1) 0]; 
 crm = @(x) [skew(x(1:3)), zeros(3,3) ; skew(x(4:6)) ,skew(x(1:3))]; 
 cmf = @(x) -crm(x).';
@@ -35,11 +35,19 @@ for i = 1:model.NB
   if model.parent(i) == 0
     v{i}  = vJ{i};
     a{i}  = (-a_grav) + crm(v{i})*vJ{i} + S{i}*qdd{i};
+    gamma{i} =  S{i}*qdd{i};
+    xi{i} = crm(v{i})*vJ{i};
+    vlam{i} = zeros(6,1);
   else
     v{i}  = v{model.parent(i)} + vJ{i};
     a{i}  = a{model.parent(i)} + crm(v{i})*vJ{i} + S{i}*qdd{i};
+    gamma{i} = gamma{model.parent(i)}+ S{i}*qdd{i};
+    xi{i} = xi{model.parent(i)}+crm(v{i})*vJ{i};
+    vlam{i} = v{model.parent(i)};
+   
   end
   aJ = crm(v{i})*vJ{i} + S{i}*qdd{i}; 
+
   % spatial kinematic quantities in ground frame
   
   Sd{i} = crm(v{i})*S{i};                                   % phi_dot
@@ -50,6 +58,11 @@ for i = 1:model.NB
   f{i}  =  I{i}*a{i} + crf(v{i})*I{i}*v{i};
   vJxS{i} = crm(vJ{i})*S{i}; % vJi x S{i}
   Ia{i} = I{i}*a{i};
+  Iv{i} = I{i}*v{i};
+  Im{i} = I{i}*m6;
+  If{i} = I{i}*f6;
+  vxsf{i} = cmf(v{i})*f6;
+  STf{i} = S{i}.'*f6;
   
   % Body coordinates
   Sb{i} =   X_m_0{i}*S{i};
@@ -62,7 +75,7 @@ for i = 1:model.NB
   ab{i} =   X_m_0{i}*a{i};
   Iab{i} =   X_m_0{i}*Ia{i};
   fb{i} =   X_m_0{i}*f{i};  % is this the correct transform?
-
+   
 end
 
 glob.B = BC;  % B(I,v) 
@@ -97,6 +110,15 @@ end
   glob.iXO = X_m_0; 
   glob.OXi = X_0_m;
   
+  glob.Iv = Iv;
+  glob.Im = Im;
+  glob.If = If;
+  glob.gamma = gamma;
+  glob.xi = xi;
+  glob.vxsf =vxsf;
+  glob.STf = STf;
+  glob.vlam = vlam;   
+    
   % body coordinates
   bod.S = Sb;  bod.Sd = Sdb;    bod.psid = psidb;
   bod.v = vb;  bod.vJxS = vJxSb; bod.psidd = psiddb;

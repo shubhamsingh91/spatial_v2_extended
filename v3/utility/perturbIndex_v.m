@@ -12,11 +12,17 @@ function out = perturbIndex_v(model,func,x,index_jj, index_ii)
      out.dSdi_dvj_cs = zeros(6,ni,nj);
      out.dpsidi_dvj_cs = zeros(6,ni,nj);
      out.dBCi_dvj_cs = zeros(6,6,nj);
-
+     
+     out.dvi_dvj_cs = zeros(6,nj);
+     out.dxii_dvj_cs = zeros(6,nj);
+     
     for ind=1:nj
         out.dSdi_dvj_cs(:,:,ind) = imag(out_cs{ind}.Sd{index_ii})/step;
         out.dpsidi_dvj_cs(:,:,ind) = imag(out_cs{ind}.psid{index_ii})/step;
         out.dBCi_dvj_cs(:,:,ind) = imag(out_cs{ind}.BC{index_ii})/step;
+
+        out.dvi_dvj_cs(:,ind) = imag(out_cs{ind}.v{index_ii})/step;
+        out.dxii_dvj_cs(:,ind) = imag(out_cs{ind}.xi{index_ii})/step;
 
     end
 end

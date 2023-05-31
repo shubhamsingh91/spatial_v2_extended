@@ -1,4 +1,4 @@
-function [glob] = perturbIndex_q(model,func,x,index_jj, index_ii)
+function [glob] = perturbIndex_q(model,func,x,index_jj, index_ii,p)
 % jt_index is the joint j w.r.t which the partial is taken
   step = 1e-20;
   m = length(x);
@@ -25,7 +25,19 @@ function [glob] = perturbIndex_q(model,func,x,index_jj, index_ii)
        glob.dfCi_dqj_cs = zeros(6,nj);
       glob.dSiT_dqj_cs = zeros(ni,6,nj);
       glob.dvi_dqj_cs = zeros(6,nj);
-        
+    
+      glob.dSi_dqjp_cs = zeros(6,ni);
+      
+      glob.dSi_dqjp_cs = zeros(6,ni);
+      glob.dIvi_dqj_cs = zeros(6,nj);
+      glob.dImi_dqj_cs = zeros(6,nj);
+      glob.dvisf_dqj_cs = zeros(6,nj);
+      glob.dSiTf_dqj_cs = zeros(ni,nj);
+      glob.dxii_dqj_cs = zeros(6,nj);
+      glob.dgammai_dqj_cs = zeros(6,nj);
+      
+   glob.dSi_dqjp_cs =imag(glob_cs{p}.S{index_ii})/step;  
+   
 for ind=1:nj
     % global coordinates
     glob.dSi_dqj_cs(:,:,ind) = imag(glob_cs{ind}.S{index_ii})/step;
@@ -42,8 +54,14 @@ for ind=1:nj
     glob.dfCi_dqj_cs(:,ind) = imag(glob_cs{ind}.fC{index_ii})/step;
     glob.dSiT_dqj_cs(:,:,ind) = imag(glob_cs{ind}.S{index_ii}.')/step;
     glob.dvi_dqj_cs = imag(glob_cs{ind}.v{index_ii})/step;
-       
     
+    glob.dIvi_dqj_cs(:,ind) = imag(glob_cs{ind}.Iv{index_ii})/step;
+    glob.dImi_dqj_cs(:,ind) = imag(glob_cs{ind}.Im{index_ii})/step;
+    glob.dvisf_dqj_cs(:,ind) = imag(glob_cs{ind}.vxsf{index_ii})/step;   
+    glob.dSiTf_dqj_cs(:,ind) = imag(glob_cs{ind}.STf{index_ii})/step;   
+    glob.dxii_dqj_cs(:,ind) = imag(glob_cs{ind}.xi{index_ii})/step;   
+    glob.dgammai_dqj_cs(:,ind) = imag(glob_cs{ind}.gamma{index_ii})/step;   
+
 end
 end
 
