@@ -6,6 +6,7 @@ New algorithms include:
 * Methods to compute the Coriolis matrix ([link](https://github.com/ROAM-Lab-ND/spatial_v2_extended/blob/main/v3/dynamics/CoriolisMatrix.m)) [all systems] and Christoffel symbols ([link](https://github.com/ROAM-Lab-ND/spatial_v2_extended/blob/main/v3/dynamics/Christoffel.m)) ([paper](http://dx.doi.org/10.1115/1.4051169))
 * Methods for assessing identifiability ([link](https://github.com/ROAM-Lab-ND/spatial_v2_extended/tree/main/v3/identifiability), [paper](https://arxiv.org/abs/1711.03896)) 
 * Methods to calculate second-order partial derivatives of Inverse Dynamics for multi-DoF joints ([link](https://github.com/ROAM-Lab-ND/spatial_v2_extended/blob/main/v3/derivatives/ID_SO_derivatives.m)) 
+* Methods to calculate second-order partial derivatives of Forward Dynamics for multi-DoF joints ([link](https://github.com/shubhamsingh91/spatial_v2_extended/blob/main/v3/derivatives/FD_SO_derivatives.m)) 
 
 New features include:
 * Extensions of most algorithms (RNEA, ABA, CRBA, etc.) to address dynamic effects from motor rotors ([link](https://github.com/ROAM-Lab-ND/spatial_v2_extended/tree/main/v3/dynamics))
