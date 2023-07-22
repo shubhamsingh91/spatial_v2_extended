@@ -12,7 +12,7 @@ fprintf('====================================\n');
 fprintf('%s\n',desc);
 fprintf('====================================\n');
 
-model.jtype{1}='SE3';
+model.jtype{1}='Fb';
 model = postProcessModel(model);
 
 q  = rand(model.NQ,1);
