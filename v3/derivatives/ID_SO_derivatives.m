@@ -48,8 +48,8 @@ for i = 1:model.NB
 end
     dM_dq  =  zeros(model.NV,model.NV,model.NV);
     d2tau_dq  =  zeros(model.NV,model.NV,model.NV);
-    d2tau_dqd =  zeros(model.NV,model.NV,model.NV);
-    d2tau_cross =  zeros(model.NV,model.NV,model.NV);
+    d2tau_dv =  zeros(model.NV,model.NV,model.NV);
+    d2tau_dqv =  zeros(model.NV,model.NV,model.NV);
     
 for i = model.NB:-1:1
     
@@ -93,16 +93,16 @@ for i = model.NB:-1:1
                            p1 = u11.'*psid_r;
                            p2 = u8.'*psid_r+u9.'*psidd_r; 
                            d2tau_dq(ii(p),jj(t),kk(r)) = p2;  
-                           d2tau_cross(ii(p),kk(r),jj(t)) =  -p1; 
+                           d2tau_dqv(ii(p),kk(r),jj(t)) =  -p1; 
 
                             if (j~=i)  
 
                                    d2tau_dq(jj(t),kk(r),ii(p)) =  u1.'*psid_r+ u2.'*psidd_r;     
                                    d2tau_dq(jj(t),ii(p),kk(r)) =  d2tau_dq(jj(t),kk(r),ii(p));        
-                                   d2tau_cross(jj(t),kk(r),ii(p)) = p1;                               
-                                   d2tau_cross(jj(t),ii(p),kk(r)) = u1.'*S_r+u2.'*(psid_r+Sd_r);                                  
-                                   d2tau_dqd(jj(t),kk(r),ii(p)) =u11.'*S_r;                                         
-                                   d2tau_dqd(jj(t),ii(p),kk(r)) = d2tau_dqd(jj(t),kk(r),ii(p));                
+                                   d2tau_dqv(jj(t),kk(r),ii(p)) = p1;                               
+                                   d2tau_dqv(jj(t),ii(p),kk(r)) = u1.'*S_r+u2.'*(psid_r+Sd_r);                                  
+                                   d2tau_dv(jj(t),kk(r),ii(p)) =u11.'*S_r;                                         
+                                   d2tau_dv(jj(t),ii(p),kk(r)) = d2tau_dv(jj(t),kk(r),ii(p));                
                                    dM_dq(kk(r),jj(t),ii(p)) =   S_r.'*u12;
                                    dM_dq(jj(t),kk(r),ii(p)) =  S_r.'*u12;
                             end
@@ -110,25 +110,25 @@ for i = model.NB:-1:1
                              if (k~=j)
                                   d2tau_dq(ii(p),kk(r),jj(t)) = p2;  
                                   d2tau_dq(kk(r),ii(p),jj(t)) =  S_r.'*u3;                                                  
-                                  d2tau_dqd(ii(p),jj(t),kk(r)) =-u11.'*S_r;     
-                                  d2tau_dqd(ii(p),kk(r),jj(t)) = -u11.'*S_r;     
-                                  d2tau_cross(ii(p),jj(t),kk(r)) = S_r.'*u5+u9.'*(psid_r+Sd_r);                               
-                                  d2tau_cross(kk(r),jj(t),ii(p)) =  S_r.'*u6;                                 
+                                  d2tau_dv(ii(p),jj(t),kk(r)) =-u11.'*S_r;     
+                                  d2tau_dv(ii(p),kk(r),jj(t)) = -u11.'*S_r;     
+                                  d2tau_dqv(ii(p),jj(t),kk(r)) = S_r.'*u5+u9.'*(psid_r+Sd_r);                               
+                                  d2tau_dqv(kk(r),jj(t),ii(p)) =  S_r.'*u6;                                 
                                   dM_dq(kk(r),ii(p),jj(t)) =  S_r.'*u9;
                                   dM_dq(ii(p),kk(r),jj(t)) =  S_r.'*u9;
 
                                   if(j~=i)
 
                                       d2tau_dq(kk(r),jj(t),ii(p)) =  d2tau_dq(kk(r),ii(p),jj(t));       
-                                      d2tau_dqd(kk(r),ii(p),jj(t)) =  S_r.'*u10;      
-                                      d2tau_dqd(kk(r),jj(t),ii(p)) = d2tau_dqd(kk(r),ii(p),jj(t));                 
-                                      d2tau_cross(kk(r),ii(p),jj(t)) =  S_r.'*u7;                      
+                                      d2tau_dv(kk(r),ii(p),jj(t)) =  S_r.'*u10;      
+                                      d2tau_dv(kk(r),jj(t),ii(p)) = d2tau_dv(kk(r),ii(p),jj(t));                 
+                                      d2tau_dqv(kk(r),ii(p),jj(t)) =  S_r.'*u7;                      
 
                                   else
-                                      d2tau_dqd(kk(r),jj(t),ii(p)) =  S_r.'*u4;             
+                                      d2tau_dv(kk(r),jj(t),ii(p)) =  S_r.'*u4;             
                                   end
                              else                 
-                                d2tau_dqd(ii(p),jj(t),kk(r)) = -u2.'*S_r;                  
+                                d2tau_dv(ii(p),jj(t),kk(r)) = -u2.'*S_r;                  
 
                              end
 
@@ -152,8 +152,8 @@ for i = model.NB:-1:1
     end
 end
 derivs.d2tau_dq=d2tau_dq;
-derivs.d2tau_dqd=d2tau_dqd;
-derivs.d2tau_cross=d2tau_cross;
+derivs.d2tau_dv=d2tau_dv;
+derivs.d2tau_dqv=d2tau_dqv;
 derivs.dM_dq=dM_dq;
 
 end
