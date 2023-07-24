@@ -31,6 +31,11 @@ UnitTest_SVATensor_prop
 printHeader('Multi-Dof Identites'); 
 UnitTest_multiDoF_iden
 
+printHeader('KKT/Impact FO/SO Derivatives'); 
+UnitTest_Derivatives_KKT
+
+
+
 function printHeader(st)
     fprintf('************************************\n');
     fprintf('%s\n',st);

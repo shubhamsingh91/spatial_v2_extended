@@ -142,6 +142,7 @@ function compare(txt, v1, v2)
     if e > 1e-7
         x = 'X';
         fprintf('%12s = %.3e  %s\n',txt,e,x); 
+          error('%s is out of tolerance',txt);              
     else
         fprintf('%12s = %.3e  \x2713\n%s\n',txt,e);         
     end

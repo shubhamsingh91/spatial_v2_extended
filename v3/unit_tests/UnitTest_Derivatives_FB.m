@@ -99,8 +99,8 @@ function checkDerivatives(model, desc)
 %
     derivs_ID_SO = ID_SO_derivatives(model, q, qd,qdd); 
     ID_qq = derivs_ID_SO.d2tau_dq;
-    ID_qdqd = derivs_ID_SO.d2tau_dqd;
-    ID_qdq = derivs_ID_SO.d2tau_cross;
+    ID_qdqd = derivs_ID_SO.d2tau_dv;
+    ID_qdq = derivs_ID_SO.d2tau_dqv;
     ID_qdd_q = derivs_ID_SO.dM_dq;
     
     derivs_FD_SO = FD_SO_derivatives(model, q, qd,qdd); 

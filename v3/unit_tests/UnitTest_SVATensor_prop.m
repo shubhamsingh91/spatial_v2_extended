@@ -96,7 +96,8 @@ function compare(txt, v1)
     end
     if e > 1e-10
         x = 'X';
-        fprintf('%12s = %.3e  %s\n',txt,e,x);     
+        fprintf('%12s = %.3e  %s\n',txt,e,x); 
+        error('%s is out of tolerance',txt);        
     else
         fprintf('%12s = %.3e  \x2713\n%s\n',txt,e);         
     end

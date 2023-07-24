@@ -6,8 +6,8 @@ function [derivs] = FD_SO_derivatives(model,q, qd,qdd)
 derivs_IDSO =  ID_SO_derivatives(model, q, qd,qdd);                   % ID SO derivatives
         
 d2tau_dq=derivs_IDSO.d2tau_dq;
-d2tau_dv=derivs_IDSO.d2tau_dqd;
-ddtau_dqv=derivs_IDSO.d2tau_cross;
+d2tau_dv=derivs_IDSO.d2tau_dv;
+ddtau_dqv=derivs_IDSO.d2tau_dqv;
 M_FO=derivs_IDSO.dM_dq;
 
 
