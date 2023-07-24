@@ -1,5 +1,7 @@
 function [da_dq,da_dv]= Impact_FO_derivatives(robot,q,v_pre)
-
+  % Tailored for the Quadruped model- Needs to be changed for different
+  % model
+  
  % Impact Dynamics- Assuming coeff. of restitution = 0
 
     [H,C] = HandC(robot,q,v_pre);

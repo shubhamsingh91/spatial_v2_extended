@@ -1,5 +1,7 @@
 function [dKKT_dq,dKKT_dv,dKKT_dtau]= KKT_FO_derivatives(robot,q,qd,tau,S)
-
+  % Tailored for the Quadruped model- Needs to be changed for different
+  % model
+  
  % KKT Dynamics
     robot =Jac_build(robot,q,qd,zeros(robot.NV,1),zeros(2,1),robot.quad_foot);
     a = KKT_FD(robot,q,qd,tau,S);

@@ -1,5 +1,7 @@
 function [derivs_SO]= Impact_SO_derivatives(robot,q,qd_pre)
-
+  % Tailored for the Quadruped model- Needs to be changed for different
+  % model
+  
     qdd = Impact_dyn(robot,q,qd_pre,0);      % [v+ -\lambda_c] 
     qd_post = qdd(1:robot.NV);               % v after the impact
     lam = -qdd(8:9);                        % [\lambda_i]
