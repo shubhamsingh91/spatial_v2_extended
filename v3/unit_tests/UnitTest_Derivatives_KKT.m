@@ -62,13 +62,13 @@ function checkDerivatives(robot,robot_params, desc)
  checkValue('KKT_qtau'       , derivs_KKT.da_dtauq         , da_dtauq_cs                );    % SO Partials of FD w.r.t. tau,q
  checkValue('KKT_tauq'       , derivs_KKT.da_dqtau         , da_dqtau_cs                );    % SO Partials of FD w.r.t. q,tau
 
- checkValue('Impact_q'   , d_imp_dq      , d_imp_dq_cs   );                                   % Partials of FD w.r.t. q
- checkValue('Impact_v'  ,  d_imp_dv     , d_imp_dv_cs  );                                     % Partials of FD w.r.t. v
+ checkValue('Impact_q'   , d_imp_dq      , d_imp_dq_cs   );                                   % Partials of Impact w.r.t. q
+ checkValue('Impact_v'  ,  d_imp_dv     , d_imp_dv_cs  );                                     % Partials of Impact w.r.t. v
 
- checkValue('Impact_qq'       , derivs_impact.da_dqq         , d_imp_dqq_cs                ); % SO Partials of FD w.r.t. q,q
- checkValue('Impact_vv'       , derivs_impact.da_dvv         , d_imp_dvv_cs                ); % SO Partials of FD w.r.t. v,v
- checkValue('Impact_qv'       , derivs_impact.da_dqv         , d_imp_dqv_cs                ); % SO Partials of FD w.r.t. q,v
- checkValue('Impact_vq'       , derivs_impact.da_dvq         , d_imp_dvq_cs                ); % SO Partials of FD w.r.t. v,q
+ checkValue('Impact_qq'       , derivs_impact.da_dqq         , d_imp_dqq_cs                ); % SO Partials of Impact w.r.t. q,q
+ checkValue('Impact_vv'       , derivs_impact.da_dvv         , d_imp_dvv_cs                ); % SO Partials of Impact w.r.t. v,v
+ checkValue('Impact_qv'       , derivs_impact.da_dqv         , d_imp_dqv_cs                ); % SO Partials of Impact w.r.t. q,v
+ checkValue('Impact_vq'       , derivs_impact.da_dvq         , d_imp_dvq_cs                ); % SO Partials of Impact w.r.t. v,q
 
   fprintf('\n');
 end
