@@ -1,0 +1,102 @@
+clc; clear all;
+
+% run([pwd,'\..\startup.m'])
+% Testing the SO partials of spatial force
+
+N = 17;
+
+% Create a random model with N links
+model = autoTree(N, 3);
+model.jtype{1}='Fb';
+model = postProcessModel(model);
+
+q  = rand(model.NQ,1);
+
+if strcmp(model.jtype{1},'SE3')
+    q(1:16) = reshape( randomSE3(),[16 1]);
+elseif strcmp(model.jtype{1},'Fb')  % normalizing the quoternion
+    q(1:4) = q(1:4)/norm(q(1:4));
+end
+
+qd = rand(model.NV,1);
+qdd = rand(model.NV,1);
+
+fprintf("N = %d\n", N)% 
+
+fprintf("model.NQ = %d\n", model.NQ)% 
+fprintf("model.NV = %d\n", model.NV)% 
+
+%% complex-step- SO derivatives of spatial force/spatial cumulative force
+step=1e-20; % step size for complex-step
+
+newConfig = @(x) configurationAddition(model,q,x);
+[glob,bod] = GlobalDynamics_red( model, q, qd, qdd);
+
+for ii=1:N
+    for jj=1:N
+         for kk=1:N
+                                                                                                                               % i variables
+        Si = glob.S{ii};       psidi = glob.psid{ii};      fCi = glob.fC{ii}; 
+        Sdi = glob.Sd{ii};      psiddi = glob.psidd{ii};
+        ICi = glob.IC{ii};      BCi = glob.BC{ii};   
+        BIic_Si = Bten(ICi,Si);
+        BIic_psidi = Bten(ICi,psidi);
+       
+                                                                                                                  % j variables
+        Sj = glob.S{jj};       psidj = glob.psid{jj};  psiddj = glob.psidd{jj};  
+        Sdj = glob.Sd{jj};      
+        
+                                                                                                                  % k variables
+        Sk = glob.S{kk};       psidk = glob.psid{kk}; 
+        Sdk = glob.Sd{kk};     psiddk = glob.psidd{kk};
+        
+        BIic_psidj = Bten(ICi,psidj);
+        
+            if (ismember(kk,model.ancestors{jj})&&ismember(jj,model.ancestors{ii}))                                   % k<=j<=i
+                   fprintf("\n ii = % d; jj= %d; kk= %d  \n \n",ii,jj,kk)      
+               [d2fi_dqj_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
+                zeros(model.NV,1), jj, kk);
+            
+                [d2fi_dqk_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
+                zeros(model.NV,1), kk, jj);
+                             
+                temp1 = 2*Tm(BIic_psidj + Tm(cmfM(Sj),BCi) - mT_v2(BCi,crmM(Sj)) ,psidk) + ...
+                            Tm( Tm(cmfM(Sj),ICi)- mT_v2(ICi,crmM(Sj)) ,psiddk);
+                
+                temp2 = Tm(cmfM(Sk), 2*BCi*psidj + ICi*psiddj+ cmf_bar(fCi)*Sj);
+                 
+                d2fi_dqj_dqk = rotR(temp1) + temp2;
+                
+                if kk~=jj                                                                                             % k<j<= i
+                   d2fi_dqk_dqj = rotR(d2fi_dqj_dqk);
+                    compare('(d2jic_dqk_dqj)'  , d2fi_dqk_dqj , d2fi_dqk_dqj_cs);
+                end
+                
+                compare('(d2jic_dqj_dqk)'  , d2fi_dqj_dqk , d2fi_dqj_dqk_cs);
+
+            end
+         end
+    end
+end
+
+
+
+%% Functions
+function compare(txt, v1, v2)
+    if (size(v1,3))>1&&(size(v2,3)>1) 
+        e = tens_norm(v1-v2);
+    else
+        e = norm(v1-v2);
+    end
+    if e > 1e-7
+        x = 'X';
+        fprintf('%12s = %.3e  %s\n',txt,e,x); 
+    else
+        fprintf('%12s = %.3e  \x2713\n%s\n',txt,e);         
+    end
+    
+end
+
+
+
+
