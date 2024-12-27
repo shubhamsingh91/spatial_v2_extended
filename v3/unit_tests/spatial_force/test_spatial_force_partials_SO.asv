@@ -70,23 +70,13 @@ for ii=1:N
                 d2fi_dqj_dqk = rotR(temp1) + temp2;
                 
                 if kk~=jj                                                                                             % k<j<= i
-          
-                   %------------------------ 
-                   
                    d2fi_dqk_dqj = rotR(d2fi_dqj_dqk);
-                   compare('(d2fic_dqk_dqj)'  , d2fi_dqk_dqj , d2fi_dqk_dqj_cs);
-          
-                   %------------------------
-                  [d2fk_dqi_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
-                    zeros(model.NV,1), ii, jj); 
+             
+                   [d2fk_dqi_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
+                    zeros(model.NV,1), ii, jj);
                    
-                    temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT_v2(BCi,crmM(Si)) ,psidj) + ...
-                                Tm( Tm(cmfM(Si),ICi)- mT_v2(ICi,crmM(Si)) ,psiddj);
-
-                    temp2 = Tm(cmfM(Sj), 2*BCi*psidi + ICi*psiddi+ cmf_bar(fCi)*Sj);
-
-                    d2fi_dqj_dqk = rotR(temp1) + temp2;
-                
+                   
+                   compare('(d2fic_dqk_dqj)'  , d2fi_dqk_dqj , d2fi_dqk_dqj_cs);
                     
                     
                 end
