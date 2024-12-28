@@ -59,8 +59,8 @@ for ii=1:N
                [d2fi_dqj_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
                 zeros(model.NV,1), jj, kk);
                                          
-                temp1 = 2*Tm(BIic_psidj + Tm(cmfM(Sj),BCi) - mT_v2(BCi,crmM(Sj)) ,psidk) + ...
-                            Tm( Tm(cmfM(Sj),ICi)- mT_v2(ICi,crmM(Sj)) ,psiddk);
+                temp1 = 2*Tm(BIic_psidj + Tm(cmfM(Sj),BCi) - mT(BCi,crmM(Sj)) ,psidk) + ...
+                            Tm( Tm(cmfM(Sj),ICi)- mT(ICi,crmM(Sj)) ,psiddk);
                 
                 temp2 = Tm(cmfM(Sk), 2*BCi*psidj + ICi*psiddj+ cmf_bar(fCi)*Sj);
                  
@@ -76,16 +76,16 @@ for ii=1:N
                    compare('(d2fic_dqk_dqj)'  , d2fi_dqk_dqj , d2fi_dqk_dqj_cs);
           
                    %------------------------
-                  [d2fk_dqi_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
-                    zeros(model.NV,1), ii, jj); 
+                 [d2fk_dqi_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
+                  zeros(model.NV,1), ii, jj);
                    
-                    temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT_v2(BCi,crmM(Si)) ,psidj) + ...
-                                Tm( Tm(cmfM(Si),ICi)- mT_v2(ICi,crmM(Si)) ,psiddj);
+                    temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT(BCi,crmM(Si)) ,psidj) + ...
+                                Tm( Tm(cmfM(Si),ICi)- mT(ICi,crmM(Si)) ,psiddj);
 
-                    temp2 = Tm(cmfM(Sj), 2*BCi*psidi + ICi*psiddi+ cmf_bar(fCi)*Sj);
+                    temp2 = Tm(cmfM(Sj), 2*BCi*psidi + ICi*psiddi+ cmf_bar(fCi)*Si);
 
                     d2fk_dqi_dqj = rotR(temp1) + temp2;
-                    compare('(d2fic_dqj_dqk)'  , d2fk_dqi_dqj , d2fk_dqi_dqj_cs);
+                    compare('(d2fk_dqi_dqj)'  , d2fk_dqi_dqj , d2fk_dqi_dqj_cs);
                     
                 end
                 
@@ -99,8 +99,8 @@ for ii=1:N
 %                   [d2fj_dqi_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
 %                       zeros(model.NV,1), ii, kk);                     
 %                 
-%                  temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT_v2(BCi,crmM(Si)) ,psidk) + ...
-%                             Tm( Tm(cmfM(Si),ICi)- mT_v2(ICi,crmM(Si)) ,psiddk);
+%                  temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT(BCi,crmM(Si)) ,psidk) + ...
+%                             Tm( Tm(cmfM(Si),ICi)- mT(ICi,crmM(Si)) ,psiddk);
 %                 
 %                 temp2 = Tm(cmfM(Sk), 2*BCi*psidi + ICi*psiddi+ cmf_bar(fCi)*Si);
 %                  
@@ -117,7 +117,7 @@ for ii=1:N
 end
 
 
-git 
+    
 %% Functions
 function compare(txt, v1, v2)
     if (size(v1,3))>1&&(size(v2,3)>1) 
