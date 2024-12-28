@@ -181,6 +181,21 @@ for ii=1:N
                  compare('(d2fj_dqi_dqk)'  , d2fj_dqi_dqk , d2fj_dqi_dqk_cs);
  
                       
+                %----- SO v case 1E
+                [d2fj_dvk_dvi_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, jj , kk), ...
+                zeros(model.NV,1), kk, ii);
+                
+                d2fj_dvk_dvi = 2*Tm(BIic_Si,Sk);
+               
+                compare('(d2fj_dvk_dvi)'  , d2fj_dvk_dvi , d2fj_dvk_dvi_cs);
+    
+                %----- SO v case 2E
+                [d2fj_dvi_dvk_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, jj , ii), ...
+                zeros(model.NV,1), ii, kk);
+                
+                d2fj_dvi_dvk = rotR(d2fj_dvk_dvi);
+               
+                compare('(d2fj_dvi_dvk)'  , d2fj_dvi_dvk , d2fj_dvi_dvk_cs);
                 end
                 
 
