@@ -3,10 +3,10 @@ clc; clear all;
 % run([pwd,'\..\startup.m'])
 % Testing the SO partials of spatial force
 
-N = 14;
+N = 17;
 
 % Create a random model with N links
-model = autoTree(N, 3);
+model = autoTree(N, 1.5, pi/3);
 model.jtype{1}='Fb';
 model = postProcessModel(model);
 
@@ -86,31 +86,25 @@ for ii=1:N
 
                     d2fk_dqi_dqj = rotR(temp1) + temp2;
                     compare('(d2fk_dqi_dqj)'  , d2fk_dqi_dqj , d2fk_dqi_dqj_cs);
+
+                    %------------------------
+                    if jj~=ii   % k < j < i 
+                        
+                    [d2fk_dqj_dqi_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
+                        zeros(model.NV,1), jj, ii);                    
+                      
+                    d2fk_dqj_dqi = rotR(d2fk_dqi_dqj);
+        
+                     compare('(d2fk_dqj_dqi)'  , d2fk_dqj_dqi , d2fk_dqj_dqi_cs);
+             
                     
+                    end
+ 
                 end
                 
 
             end
-            
-%             if (ismember(jj,model.ancestors{kk})&&ismember(kk,model.ancestors{ii}))                                   % 
-%                 
-%                 if kk~=jj                                                                                             % j<k<=i
-%                     
-%                   [d2fj_dqi_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
-%                       zeros(model.NV,1), ii, kk);                     
-%                 
-%                  temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT(BCi,crmM(Si)) ,psidk) + ...
-%                             Tm( Tm(cmfM(Si),ICi)- mT(ICi,crmM(Si)) ,psiddk);
-%                 
-%                 temp2 = Tm(cmfM(Sk), 2*BCi*psidi + ICi*psiddi+ cmf_bar(fCi)*Si);
-%                  
-%                 d2fj_dqi_dqk = rotR(temp1) + temp2;
-%                 
-%                 compare('(d2fjc_dqi_dqk)'  , d2fj_dqi_dqk , d2fj_dqi_dqk_cs);
-%              
-%                 end
-%             end
-            
+                        
             
          end
     end
