@@ -3,7 +3,7 @@ clc; clear all;
 % run([pwd,'\..\startup.m'])
 % Testing the SO partials of spatial force
 
-N = 17;
+N = 14;
 
 % Create a random model with N links
 model = autoTree(N, 3);
@@ -58,59 +58,60 @@ for ii=1:N
                    
                [d2fi_dqj_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
                 zeros(model.NV,1), jj, kk);
-            
-                [d2fi_dqk_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
-                zeros(model.NV,1), kk, jj);
-                             
-                temp1 = 2*Tm(BIic_psidj + Tm(cmfM(Sj),BCi) - mT_v2(BCi,crmM(Sj)) ,psidk) + ...
-                            Tm( Tm(cmfM(Sj),ICi)- mT_v2(ICi,crmM(Sj)) ,psiddk);
+                                         
+                temp1 = 2*Tm(BIic_psidj + Tm(cmfM(Sj),BCi) - mT(BCi,crmM(Sj)) ,psidk) + ...
+                            Tm( Tm(cmfM(Sj),ICi)- mT(ICi,crmM(Sj)) ,psiddk);
                 
                 temp2 = Tm(cmfM(Sk), 2*BCi*psidj + ICi*psiddj+ cmf_bar(fCi)*Sj);
                  
                 d2fi_dqj_dqk = rotR(temp1) + temp2;
                 
                 if kk~=jj                                                                                             % k<j<= i
-                   d2fi_dqk_dqj = rotR(d2fi_dqj_dqk);
-             
-                   [d2fk_dqi_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
-                    zeros(model.NV,1), ii, jj);
+          
+                   %------------------------ 
                    
-                   
+                 [d2fi_dqk_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
+                  zeros(model.NV,1), kk, jj);
+                  d2fi_dqk_dqj = rotR(d2fi_dqj_dqk);
                    compare('(d2fic_dqk_dqj)'  , d2fi_dqk_dqj , d2fi_dqk_dqj_cs);
+          
+                   %------------------------
+                 [d2fk_dqi_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
+                  zeros(model.NV,1), ii, jj);
+                   
+                    temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT(BCi,crmM(Si)) ,psidj) + ...
+                                Tm( Tm(cmfM(Si),ICi)- mT(ICi,crmM(Si)) ,psiddj);
+
+                    temp2 = Tm(cmfM(Sj), 2*BCi*psidi + ICi*psiddi+ cmf_bar(fCi)*Si);
+
+                    d2fk_dqi_dqj = rotR(temp1) + temp2;
+                    compare('(d2fk_dqi_dqj)'  , d2fk_dqi_dqj , d2fk_dqi_dqj_cs);
+
+                    %------------------------
+                    if jj~=ii   % k < j < i 
+                        
+                    [d2fk_dqj_dqi_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
+                        zeros(model.NV,1), jj, ii);                    
+                      
+                    d2fk_dqj_dqi = rotT(d2fk_dqi_dqj);
+        
+                        compare('(d2fk_dqi_dqj)'  , d2fk_dqi_dqj , d2fk_dqi_dqj_cs);
+             
                     
-                    
+                    end
+ 
                 end
                 
-                compare('(d2fic_dqj_dqk)'  , d2fi_dqj_dqk , d2fi_dqj_dqk_cs);
 
             end
-            
-%             if (ismember(jj,model.ancestors{kk})&&ismember(kk,model.ancestors{ii}))                                   % 
-%                 
-%                 if kk~=jj                                                                                             % j<k<=i
-%                     
-%                   [d2fj_dqi_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
-%                       zeros(model.NV,1), ii, kk);                     
-%                 
-%                  temp1 = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi) - mT_v2(BCi,crmM(Si)) ,psidk) + ...
-%                             Tm( Tm(cmfM(Si),ICi)- mT_v2(ICi,crmM(Si)) ,psiddk);
-%                 
-%                 temp2 = Tm(cmfM(Sk), 2*BCi*psidi + ICi*psiddi+ cmf_bar(fCi)*Si);
-%                  
-%                 d2fj_dqi_dqk = rotR(temp1) + temp2;
-%                 
-%                 compare('(d2fjc_dqi_dqk)'  , d2fj_dqi_dqk , d2fj_dqi_dqk_cs);
-%              
-%                 end
-%             end
-            
+                        
             
          end
     end
 end
 
 
-
+    
 %% Functions
 function compare(txt, v1, v2)
     if (size(v1,3))>1&&(size(v2,3)>1) 
@@ -121,6 +122,8 @@ function compare(txt, v1, v2)
     if e > 1e-7
         x = 'X';
         fprintf('%12s = %.3e  %s\n',txt,e,x); 
+        error('ErrorID:SpecificError', 'Expression not correct');
+
     else
         fprintf('%12s = %.3e  \x2713\n%s\n',txt,e);         
     end
