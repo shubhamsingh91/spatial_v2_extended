@@ -68,6 +68,19 @@ for ii=1:N
                  
                 d2fi_dqj_dqk = rotR(temp1) + temp2;
                 
+                compare('(d2fic_dqj_dqk)'  , d2fi_dqj_dqk , d2fi_dqj_dqk_cs);
+                
+                %------- SO a/q Case 1A
+                
+                [d2fi_daj_dqk_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
+                zeros(model.NV,1), jj, kk);
+                                         
+                 
+                d2fi_daj_dqk = Tm(Tm(cmfM(Sk),ICi) , Sj);
+                
+                compare('(d2fic_daj_dqk) case 1A'  , d2fi_daj_dqk , d2fi_daj_dqk_cs);               
+                
+             
                 if kk~=jj  % k<j<=i                                                                                           % k<j<= i
           
                    %------------------------ 
@@ -116,7 +129,25 @@ for ii=1:N
                
                     compare('(d2fk_dvj_dvi) case 2C'  , d2fk_dvj_dvi , d2fk_dvj_dvi_cs);           
                     
-                    
+                 %------- SO a/q Case 2B j !=i
+                
+                [d2fk_dai_dqj_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
+                zeros(model.NV,1), ii, jj);
+                                         
+                 
+                d2fk_dai_dqj = Tm(cmfM(Sj), ICi*Si);
+                
+                compare('(d2fk_dai_dqj) case 2B'  , d2fk_dai_dqj , d2fk_dai_dqj_cs); 
+                
+               %------- SO a/q Case 2C
+                
+                [d2fk_daj_dqi_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
+                zeros(model.NV,1), jj, ii);
+                                         
+                d2fk_daj_dqi = Tm(Tm(cmfM(Si),ICi) - mT(ICi,crmM(Si)), Sj);
+                
+                compare('(d2fk_daj_dqi) Case 2C'  , d2fk_daj_dqi , d2fk_daj_dqi_cs); 
+                
                     else % k < j = i
                         
                      [d2fk_dvi_dvj_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, kk , ii), ...
@@ -145,6 +176,17 @@ for ii=1:N
                 d2fi_dvk_dvj = rotR(d2fi_dvj_dvk);
                
                 compare('(d2fi_dvk_dvj)'  , d2fi_dvk_dvj , d2fi_dvk_dvj_cs);
+                
+                %------- SO a/q Case 1B
+                
+                [d2fi_dak_dqj_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
+                zeros(model.NV,1), kk, jj);
+                                         
+                 
+                d2fi_dak_dqj = Tm(Tm(cmfM(Sj),ICi) - mT(ICi,crmM(Sj)) , Sk);
+                
+                compare('(d2fi_dak_dqj) case 1A'  , d2fi_dak_dqj , d2fi_dak_dqj_cs); 
+                
                 
                 else % k=j<=i
                  %--------- SO derivs w.r.t v case B
@@ -196,6 +238,26 @@ for ii=1:N
                 d2fj_dvi_dvk = rotR(d2fj_dvk_dvi);
                
                 compare('(d2fj_dvi_dvk)'  , d2fj_dvi_dvk , d2fj_dvi_dvk_cs);
+                
+                %------- SO a/q Case 2A
+                
+                [d2fj_dai_dqk_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
+                zeros(model.NV,1), ii, kk);
+                                         
+                 
+                d2fj_dai_dqk = Tm(Tm(cmfM(Sk),ICi) , Si);
+                
+                compare('(d2fj_dai_dqk) Case 2A'  , d2fj_dai_dqk , d2fj_dai_dqk_cs);               
+                
+               %------- SO a/q Case 1C
+                
+                [d2fj_dak_dqi_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , kk), ...
+                zeros(model.NV,1), kk, ii);
+                                         
+                d2fj_dak_dqi = Tm(Tm(cmfM(Si),ICi) - mT(ICi,crmM(Si)), Sk);
+                
+                compare('(d2fj_dak_dqi) Case 2A'  , d2fj_dak_dqi , d2fj_dak_dqi_cs); 
+                
                 end
                 
             % SO-a 
