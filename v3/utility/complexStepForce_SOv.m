@@ -1,4 +1,4 @@
-function [d2fc_dq] = complexStepForce(model, f, x, jj,kk, step)
+function [d2fc_dq] = complexStepForce_SOv(model, f, x, jj,kk, step)
     if nargin == 5
         step = eps;
     end
