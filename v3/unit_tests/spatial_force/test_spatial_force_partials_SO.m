@@ -68,7 +68,7 @@ for ii=1:N
                  
                 d2fi_dqj_dqk = rotR(temp1) + temp2;
                 
-                if kk~=jj                                                                                             % k<j<= i
+                if kk~=jj  % k<j<=i                                                                                           % k<j<= i
           
                    %------------------------ 
                    
@@ -116,6 +116,16 @@ for ii=1:N
                
                     compare('(d2fk_dvj_dvi) case 2C'  , d2fk_dvj_dvi , d2fk_dvj_dvi_cs);           
                     
+                    
+                    else % k < j = i
+                        
+                     [d2fk_dvi_dvj_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, kk , ii), ...
+                    zeros(model.NV,1), ii, jj);
+                
+                    d2fk_dvi_dvj = rotR(Tm (cmf_barM(ICi*Si)+ Tm(cmfM(Si),ICi) ,Sj));
+               
+                    compare('(d2fk_dvi_dvj) case D'  , d2fk_dvi_dvj , d2fk_dvi_dvj_cs);     
+                        
                     end
  
                 %--------- SO derivs w.r.t v case 1A
