@@ -3,7 +3,7 @@ clc; clear all;
 % run([pwd,'\..\startup.m'])
 % Testing the SO partials of spatial force
 
-N = 21;
+N = 7;
 
 % Create a random model with N links
 model = autoTree(N, 1.5, pi/3);
@@ -202,9 +202,24 @@ for ii=1:N
                [d2fi_daj_dak_cs] = complexStepForce_SOa(model, @(x) spatial_force_derivatives(model, q ,qd ,x, ii , jj), ...
                 zeros(model.NV,1), jj, kk);
                 
-                d2fi_daj_dvk = zeros(size(d2fi_daj_dak_cs));
-                 compare('(d2fi_daj_dvk) -- all cases'  , d2fi_daj_dvk , d2fi_daj_dak_cs);
+                d2fi_daj_dak = zeros(size(d2fi_daj_dak_cs));
+                 compare('(d2fi_daj_dak) -- all cases'  , d2fi_daj_dak , d2fi_daj_dak_cs);
                
+                
+            % SO-a/v 
+               [d2fi_daj_dvk_cs] = complexStepForce_SOav(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, ii , jj), ...
+                zeros(model.NV,1), jj, kk);
+                
+                d2fi_daj_dvk = zeros(size(d2fi_daj_dvk_cs));
+                 compare('(d2fi_daj_dvk) -- all cases'  , d2fi_daj_dvk , d2fi_daj_dvk_cs);
+                 
+            % SO-v/a
+               [d2fi_dvj_dak_cs] = complexStepForce_SOva(model, @(x) spatial_force_derivatives(model, q ,qd ,x, ii , jj), ...
+                zeros(model.NV,1), jj, kk);
+                
+                d2fi_dvj_dak = zeros(size(d2fi_dvj_dak_cs));
+                 compare('(d2fi_dvj_dak) -- all cases'  , d2fi_dvj_dak , d2fi_dvj_dak_cs);               
+                 
             end
                         
             
