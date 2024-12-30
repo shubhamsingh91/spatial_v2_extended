@@ -3,7 +3,7 @@ clc; clear all;
 % run([pwd,'\..\startup.m'])
 % Testing the SO partials of spatial force
 
-N = 7;
+N = 21;
 
 % Create a random model with N links
 model = autoTree(N, 1.5, pi/3);
@@ -53,7 +53,8 @@ for ii=1:N
    
         BIic_Sj = Bten(ICi,Sj);
         BIic_psidj = Bten(ICi,psidj);
-        
+        BIic_psidk = Bten(ICi,psidk);
+
             if (ismember(kk,model.ancestors{jj})&&ismember(jj,model.ancestors{ii}))                                   % k<=j<=i
                 
                fprintf("\n ii = % d; jj= %d; kk= %d  \n \n",ii,jj,kk)      
@@ -80,6 +81,17 @@ for ii=1:N
                 
                 compare('(d2fic_daj_dqk) case 1A'  , d2fi_daj_dqk , d2fi_daj_dqk_cs);               
                 
+                
+                %------- SO v/q Case 1A
+                
+                [d2fi_dvj_dqk_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
+                zeros(model.NV,1), jj, kk);
+                                         
+                 
+                d2fi_dvj_dqk = 2*Tm(BIic_psidk + Tm(cmfM(Sk),BCi)+mT(ICi,crmM(psidk)), Sj) +...
+                            Tm(cmfM(Sk),ICi*(psidj+Sdj));
+                
+                compare('(d2fi_dvj_dqk) case 1A'  , d2fi_dvj_dqk , d2fi_dvj_dqk_cs);
              
                 if kk~=jj  % k<j<=i                                                                                           % k<j<= i
           
@@ -257,6 +269,17 @@ for ii=1:N
                 d2fj_dak_dqi = Tm(Tm(cmfM(Si),ICi) - mT(ICi,crmM(Si)), Sk);
                 
                 compare('(d2fj_dak_dqi) Case 2A'  , d2fj_dak_dqi , d2fj_dak_dqi_cs); 
+                
+              %------- SO v/q Case 2A
+                
+                [d2fj_jdvi_dqk_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
+                zeros(model.NV,1), ii, kk);
+                                         
+                 
+                d2fj_dvi_dqk = 2*Tm(BIic_psidk + Tm(cmfM(Sk),BCi)+mT(ICi,crmM(psidk)), Si) +...
+                            Tm(cmfM(Sk),ICi*(psidi+Sdi));
+                
+                compare('(d2fj_dvi_dqk) case 2A'  , d2fj_dvi_dqk , d2fj_jdvi_dqk_cs);
                 
                 end
                 
