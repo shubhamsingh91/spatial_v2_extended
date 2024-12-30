@@ -7,15 +7,17 @@ model = autoTree(N,1);
 model.jtype{1} = 'S';
 model = postProcessModel(model);
 
-syms q [model.NQ, 1] real  % Create a symbolic vector q_sym
+syms q [3, 1] real  % Create a symbolic vector q_sym
+S = sphericalZYXSubspace(q);
 
- S = sphericalZYXSubspace(q);
- syms m [3,1 ] real
- jac_expr1 = jacobian(S*m,q);
+% S * m
+syms m [3,1 ] real
+jac_expr1 = jacobian(S*m,q);
+matlabFunction(jac_expr1, 'Vars', {q, m}, 'File', 'Sm.m');
 
- % Convert the Jacobian into a MATLAB function and save it as a .m file
-matlabFunction(jac_expr1, 'Vars', {q, m}, 'File', 'jacobian_function.m');
+% S.' * m
+syms n [6,1 ] real
+jac_expr2 = jacobian(S.'*n,q);
+matlabFunction(jac_expr2, 'Vars', {q, n}, 'File', 'STn.m');
 
-% Convert the Jacobian into a C++ function and save it as a .cpp file
-matlabFunction(jac_expr1, 'Vars', {q, m}, 'File', 'jacobian_function_cpp', 'Optimize', true);
-codegen jacobian_function -args {zeros(3, 1), zeros(3, 1)}
+
