@@ -10,14 +10,13 @@ model = postProcessModel(model);
 syms q [3, 1] real  % Create a symbolic vector q_sym
 S = sphericalZYXSubspace(q);
 
-% S * m
-syms m [3,1 ] real
-jac_expr1 = jacobian(S*m,q);
-matlabFunction(jac_expr1, 'Vars', {q, m}, 'File', 'S_ring', 'Outputs', {'jac_expr1'}, 'Vars', {q, m});
+% S_ring = partial (S)/partial (q)  * v
+syms v [3,1 ] real
+s_ring = jacobian(S*v,q);
+matlabFunction(s_ring, 'Vars', {q, v}, 'File', 's_ring', 'Outputs', {'s_ring'});
 
-% S.' * m
-syms n [6,1 ] real
-jac_expr2 = jacobian(S.'*n,q);
-matlabFunction(jac_expr2, 'Vars', {q, n}, 'File', 'STn.m');
+% partial (S_ring * v)/partial q
+s_ring_times_v_partial = jacobian(s_ring*v,q);
+matlabFunction(s_ring_times_v_partial, 'Vars', {q, v}, 'File', 's_ring_v_deriv', 'Outputs', {'s_ring_v_partial'});
 
 
