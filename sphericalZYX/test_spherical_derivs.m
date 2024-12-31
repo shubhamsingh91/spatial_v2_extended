@@ -56,3 +56,12 @@ s_ring_v_deriv = jacobian(s_ring*v,q);
 matlabFunction(s_ring_v_deriv, 'Vars', {q, v}, 'File', 's_ring_v_deriv', 'Outputs', {'s_ring_v_deriv'});
 
 
+%% testing numerical values
+qnum = [1,1,1].'; mnum = [1,2,3].';
+vnum = [1,1,1].'; fnum = [1,2,3,4,5,6].';
+
+s_ring_num  = double(subs(s_ring,[q,v],[qnum,vnum]))
+
+s_ring_v_deriv_num = double(subs(s_ring_v_deriv,[q,v],[qnum,vnum]))
+
+dsm_dq_num = double(subs(dSm_dq,[q,m],[qnum,mnum]))
