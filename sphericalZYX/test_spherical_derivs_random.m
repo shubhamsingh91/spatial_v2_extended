@@ -10,5 +10,5 @@ s_ring_v_deriv_num = s_ring_v_deriv(qnum,vnum)
 
 dsm_dq_num = dSm_dq(qnum,mnum)
 % 
-% dSTf_dq_num = dSTf_dq(qnum,fnum)
+dSTf_dq_num = dSTf_dq(qnum,fnum)
 % 
