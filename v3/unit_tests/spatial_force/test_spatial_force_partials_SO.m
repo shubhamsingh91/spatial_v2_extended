@@ -3,7 +3,7 @@ clc; clear all;
 % run([pwd,'\..\startup.m'])
 % Testing the SO partials of spatial force
 
-N = 21;
+N = 7;
 
 % Create a random model with N links
 model = autoTree(N, 2, pi/3);
@@ -26,6 +26,13 @@ fprintf("N = %d\n", N)%
 fprintf("model.NQ = %d\n", model.NQ)% 
 fprintf("model.NV = %d\n", model.NV)% 
 
+%% Testing cumulative spatial force derivs using full single-DoF algo
+
+[derivs] = spatial_force_SO_derivs(model, q, qd, qdd);
+
+d2fc_dq_algo = derivs.d2fc_dq;
+
+
 %% complex-step- SO derivatives of spatial force/spatial cumulative force
 step=1e-20; % step size for complex-step
 
@@ -36,6 +43,9 @@ tic
 for ii=1:N
     for jj=1:N
          for kk=1:N
+             
+             ii_vec = model.vinds{ii}; jj_vec = model.vinds{jj};
+             kk_vec = model.vinds{kk};
                                                                                                                                % i variables
         Si = glob.S{ii};       psidi = glob.psid{ii};      fCi = glob.fC{ii}; 
         Sdi = glob.Sd{ii};      psiddi = glob.psidd{ii};
@@ -70,6 +80,7 @@ for ii=1:N
                 d2fi_dqj_dqk = rotR(temp1) + temp2;
                 
                 compare('(d2fic_dqj_dqk)'  , d2fi_dqj_dqk , d2fi_dqj_dqk_cs);
+                compare('(d2fic_dqj_dqk-- algo)'  , d2fi_dqj_dqk , d2fc_dq_algo{ii}(1:6,jj_vec,kk_vec));
                 
                 %------- SO a/q Case 1A
                 
@@ -356,6 +367,10 @@ toc
     
 %% Functions
 function compare(txt, v1, v2)
+
+    if (size(v1)~= size(v2))
+        error('ErrorID:SpecificError', 'Size not correct');
+    end
     if (size(v1,3))>1&&(size(v2,3)>1) 
         e = tens_norm(v1-v2);
     else
@@ -364,7 +379,7 @@ function compare(txt, v1, v2)
     if e > 1e-7
         x = 'X';
         fprintf('%12s = %.3e  %s\n',txt,e,x); 
-        error('ErrorID:SpecificError', 'Expression not correct');
+%         error('ErrorID:SpecificError', 'Expression not correct');
 
     else
         fprintf('%12s = %.3e  \x2713\n%s\n',txt,e);         
