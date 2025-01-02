@@ -86,12 +86,15 @@ for i = model.NB:-1:1
                         S_r    = S{k}(:,r);    Sd_r   = Sd{k}(:,r);
                         psid_r = psid{k}(:,r); psidd_r = psidd{k}(:,r);
             
-                          
-                           d2fc_dq{ii(p)}(:,jj(t),kk(r)) = (Bic_psijt_dot +2*dot(BCi,S_t))*psid_r +...
+                          temp  =(Bic_psijt_dot +2*dot(BCi,S_t))*psid_r +...
                                                             dot(ICi,S_t)*psidd_r +...
-                                                            crf(S_r)*(BCi*psid_t+ICi*psidd_t+crf_bar(fCi)*S_t);  
-
-
+                                                            crf(S_r)*(BCi*psid_t+ICi*psidd_t+crf_bar(fCi)*S_t) 
+     
+                            d2fc_dq{i}(:,jj(t),kk(r)) =  temp
+                             if (((ii==2)&&(jj==2))&&(kk==2))
+                                disp("stop")
+                             end
+    
                             if (j~=i)  % kk <= j < i
 
                                
