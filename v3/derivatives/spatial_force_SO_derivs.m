@@ -48,7 +48,6 @@ for i = 1:model.NB
 
 end
 
-
 for i = model.NB:-1:1
         
         BCi = BC{i};
@@ -85,28 +84,40 @@ for i = model.NB:-1:1
                          
                         S_r    = S{k}(:,r);    Sd_r   = Sd{k}(:,r);
                         psid_r = psid{k}(:,r); psidd_r = psidd{k}(:,r);
-            
-                          temp  =(Bic_psijt_dot +2*dot(BCi,S_t))*psid_r +...
-                                                            dot(ICi,S_t)*psidd_r +...
-                                                            crf(S_r)*(BCi*psid_t+ICi*psidd_t+crf_bar(fCi)*S_t) 
-     
-                            d2fc_dq{i}(:,jj(t),kk(r)) =  temp
-                             if (((ii==2)&&(jj==2))&&(kk==2))
-                                disp("stop")
-                             end
+                        
+                        % expr-1 SO-q
+                        d2fc_dq{i}(:,jj(t),kk(r)) =  (Bic_psijt_dot +dot(BCi,S_t))*psid_r ...
+                                                         +dot(ICi,S_t)*psidd_r + ...
+                                                         crf(S_r)*(BCi*psid_t+ICi*psidd_t+crf_bar(fCi)*S_t) ;
+                            
     
                             if (j~=i)  % kk <= j < i
-
+                               % expr-5 SO-q
+                               d2fc_dq{j}(:,kk(r),ii(p)) = dot(ICi,S_p)*psidd_r+...
+                                                            crf_bar(ICi*psidd_p+crf_bar(fCi)*S_p+BCi*psid_p)*S_r+...
+                                                            (Bic_psii_dot+dot(BCi,S_p))*psid_r;
                                
+                               % expr-6 SO-q
+                               d2fc_dq{j}(:,ii(p),kk(r)) = d2fc_dq{j}(:,kk(r),ii(p));
+
                                 
                             end
 
                              if (k~=j) % kk < j <= i
+                               % expr-2 SO-q
+                               d2fc_dq{i}(:,kk(r),jj(t))  = d2fc_dq{i}(:,jj(t),kk(r)) ;
+                               
+                               % expr-3 SO-q
+                                d2fc_dq{k}(:,ii(p),jj(t)) = (Bic_psii_dot+dot(BCi,S_p))*psid_t+...         
+                                                            dot(ICi,S_p)*psidd_t+...
+                                                            crf(S_t)*(BCi*psid_p+ICi*psidd_p+crf_bar(fCi)*S_p);
+
                                  
                                  
 
                                   if(j~=i) % kk < j < i
-
+                                  % expr-4 SO-q
+                                     d2fc_dq{k}(:,jj(t),ii(p)) =  d2fc_dq{k}(:,ii(p),jj(t));
                                                       
 
                                   else % kk < j = i

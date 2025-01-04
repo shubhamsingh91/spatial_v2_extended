@@ -112,7 +112,8 @@ for ii=1:N
                   zeros(model.NV,1), kk, jj);
                   d2fi_dqk_dqj = rotR(d2fi_dqj_dqk);
                    compare('(d2fic_dqk_dqj)'  , d2fi_dqk_dqj , d2fi_dqk_dqj_cs);
-          
+                   compare('(d2fic_dqk_dqj) - algo'  , d2fi_dqk_dqj ,  d2fc_dq_algo{ii}(1:6,kk_vec,jj_vec));
+
                    %------------------------
                  [d2fk_dqi_dqj_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
                   zeros(model.NV,1), ii, jj);
@@ -124,6 +125,7 @@ for ii=1:N
 
                     d2fk_dqi_dqj = rotR(temp1) + temp2;
                     compare('(d2fk_dqi_dqj)'  , d2fk_dqi_dqj , d2fk_dqi_dqj_cs);
+                    compare('(d2fk_dqi_dqj- algo)'  , d2fk_dqi_dqj ,  d2fc_dq_algo{kk}(1:6,ii_vec,jj_vec));
 
                     %------------------------
                     if jj~=ii   % k < j < i 
@@ -134,6 +136,7 @@ for ii=1:N
                     d2fk_dqj_dqi = rotR(d2fk_dqi_dqj);
         
                      compare('(d2fk_dqj_dqi)'  , d2fk_dqj_dqi , d2fk_dqj_dqi_cs);
+                     compare('(d2fk_dqj_dqi) - algo'  , d2fk_dqj_dqi , d2fc_dq_algo{kk}(1:6,jj_vec,ii_vec));
                      
                      
                      %------- SO w.r.t v for Case 1C
@@ -266,7 +269,8 @@ for ii=1:N
 
                  d2fj_dqk_dqi = temp1 + temp2;                   
                       compare('(d2fj_dqk_dqi)'  , d2fj_dqk_dqi , d2fj_dqk_dqi_cs);
-                   
+                      compare('(d2fj_dqk_dqi)-- algo'  , d2fj_dqk_dqi , d2fc_dq_algo{jj}(1:6,kk_vec,ii_vec));
+
                 %-----
                 [d2fj_dqi_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
                         zeros(model.NV,1), ii, kk);
@@ -274,7 +278,8 @@ for ii=1:N
                 d2fj_dqi_dqk = rotR(d2fj_dqk_dqi);
                 
                  compare('(d2fj_dqi_dqk)'  , d2fj_dqi_dqk , d2fj_dqi_dqk_cs);
- 
+                 compare('(d2fj_dqi_dqk) -- algo'  , d2fj_dqi_dqk , d2fc_dq_algo{jj}(1:6,ii_vec,kk_vec));
+
                       
                 %----- SO v case 1E
                 [d2fj_dvk_dvi_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, jj , kk), ...
@@ -379,7 +384,7 @@ function compare(txt, v1, v2)
     if e > 1e-7
         x = 'X';
         fprintf('%12s = %.3e  %s\n',txt,e,x); 
-%         error('ErrorID:SpecificError', 'Expression not correct');
+        error('ErrorID:SpecificError', 'Expression not correct');
 
     else
         fprintf('%12s = %.3e  \x2713\n%s\n',txt,e);         
