@@ -32,7 +32,8 @@ fprintf("model.NV = %d\n", model.NV)%
 
 d2fc_dq_algo = derivs.d2fc_dq;
 d2fc_dv_algo = derivs.d2fc_dv;
-
+d2fc_dav_algo = derivs.d2fc_dav;
+d2fc_dvq_algo = derivs.d2fc_dvq;
 
 %% complex-step- SO derivatives of spatial force/spatial cumulative force
 step=1e-20; % step size for complex-step
@@ -92,6 +93,7 @@ for ii=1:N
                 d2fi_daj_dqk = Tm(Tm(cmfM(Sk),ICi) , Sj);
                 
                 compare('(d2fic_daj_dqk) case 1A'  , d2fi_daj_dqk , d2fi_daj_dqk_cs);               
+                compare('(d2fic_daj_dqk) case 1A - algo'  , d2fi_daj_dqk , d2fc_dav_algo{ii}(:,jj_vec,kk_vec));               
                 
                 
                 %------- SO v/q Case 1A
@@ -315,6 +317,7 @@ for ii=1:N
                 d2fj_dai_dqk = Tm(Tm(cmfM(Sk),ICi) , Si);
                 
                 compare('(d2fj_dai_dqk) Case 2A'  , d2fj_dai_dqk , d2fj_dai_dqk_cs);               
+                compare('(d2fj_dai_dqk) Case 2A -- algo'  , d2fj_dai_dqk , d2fc_dav_algo{jj}(:,ii_vec,kk_vec));               
                 
                %------- SO a/q Case 1C
                 
