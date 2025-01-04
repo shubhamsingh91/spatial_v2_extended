@@ -112,7 +112,11 @@ for i = model.NB:-1:1
                                
                                % expr-2 SO-av
                                d2fc_dav{j}(:,ii(p),kk(r)) = crf(S_r)*ICi*S_p;
+                               
+                               % expr-5 SO-av
+                               d2fc_dav{j}(:,kk(r),ii(p)) = dot(ICi,S_p)*S_r;
 
+                               
                             end
 
                              if (k~=j) % kk < j <= i
@@ -140,6 +144,12 @@ for i = model.NB:-1:1
                                    d2fc_dv{k}(:,ii(p),jj(t)) = Bic_phii*S_t;
                                    % expr- 5 SO-v
                                    d2fc_dv{k}(:,jj(t),ii(p)) = d2fc_dv{k}(:,ii(p),jj(t));
+                                
+                                   %expr - 4 SO-av
+                                   d2fc_dav{k}(:,ii(p),jj(t)) = crf(S_t)*ICi*S_p;
+                                   
+                                   % expr-6 SO-av
+                                   d2fc_dav{k}(:,jj(r),ii(p)) = dot(ICi,S_p)*S_t;
 
 
                                   else % kk < j = i

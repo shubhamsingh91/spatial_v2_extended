@@ -169,6 +169,7 @@ for ii=1:N
                 d2fk_dai_dqj = Tm(cmfM(Sj), ICi*Si);
                 
                 compare('(d2fk_dai_dqj) case 2B'  , d2fk_dai_dqj , d2fk_dai_dqj_cs); 
+                compare('(d2fk_dai_dqj) case 2B --algo'  , d2fk_dai_dqj , d2fc_dav_algo{kk}(:,ii_vec,jj_vec)); 
                 
                %------- SO a/q Case 2C
                 
