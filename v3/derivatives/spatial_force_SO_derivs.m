@@ -45,6 +45,7 @@ for i = 1:model.NB
     BC{i} = 2*factorFunctions(IC{i},v{i});
     f{i}  =  IC{i}*a{i} + crf(v{i})*IC{i}*v{i};
     d2fc_dq{i}  =  zeros(6,model.NV,model.NV);
+    d2fc_dv{i}  =  zeros(6,model.NV,model.NV);
 
 end
 
@@ -73,7 +74,8 @@ for i = model.NB:-1:1
               
             S_t    = S{j}(:,t);    Sd_t   = Sd{j}(:,t);
             psid_t = psid{j}(:,t); psidd_t = psidd{j}(:,t);
-        
+            
+            Bic_phij = 2*factorFunctions(IC{i} ,S_t);
             Bic_psijt_dot = 2*factorFunctions(IC{i} ,psid_t);
     
                k = j;
@@ -99,8 +101,11 @@ for i = model.NB:-1:1
                                
                                % expr-6 SO-q
                                d2fc_dq{j}(:,ii(p),kk(r)) = d2fc_dq{j}(:,kk(r),ii(p));
-
-                                
+                            
+                               % expr-7 SO-v
+                               d2fc_dv{j}(:,kk(r),ii(p)) = Bic_phii*S_r;
+                               % expr-8 SO-v
+                               d2fc_dv{j}(:,ii(p),kk(r)) = d2fc_dv{j}(:,kk(r),ii(p)); 
                             end
 
                              if (k~=j) % kk < j <= i
@@ -111,20 +116,33 @@ for i = model.NB:-1:1
                                 d2fc_dq{k}(:,ii(p),jj(t)) = (Bic_psii_dot+dot(BCi,S_p))*psid_t+...         
                                                             dot(ICi,S_p)*psidd_t+...
                                                             crf(S_t)*(BCi*psid_p+ICi*psidd_p+crf_bar(fCi)*S_p);
-
-                                 
+                                
+                               % expr-1 SO-v
+                               d2fc_dv{i}(:,jj(t),kk(r)) = Bic_phij*S_r;
+                               % expr-2 SO-v
+                                d2fc_dv{i}(:,kk(r),jj(t)) = d2fc_dv{i}(:,jj(t),kk(r));
                                  
 
                                   if(j~=i) % kk < j < i
                                   % expr-4 SO-q
                                      d2fc_dq{k}(:,jj(t),ii(p)) =  d2fc_dq{k}(:,ii(p),jj(t));
-                                                      
+                        
+                                   % expr-4 SO-v
+                                   d2fc_dv{k}(:,ii(p),jj(t)) = Bic_phii*S_t;
+                                   % expr- 5 SO-v
+                                   d2fc_dv{k}(:,jj(t),ii(p)) = d2fc_dv{k}(:,ii(p),jj(t));
+
 
                                   else % kk < j = i
+                                   % expr- 6 SO-v
+                                    d2fc_dv{k}(:,ii(p),jj(t)) = (crf(S_p)*ICi+crf_bar(ICi*S_p))*S_t; 
                                       
                                   end
                                   
-                             else     % kk = j <= i             
+                             else     % kk = j <= i    
+                                 
+                                 % expr-3 SO-v
+                                 d2fc_dv{i}(:,jj(t),kk(r)) = (crf(S_t)*ICi + crf_bar(ICi*S_t))*S_r;
 
                              end
 
@@ -148,6 +166,7 @@ for i = model.NB:-1:1
     end
 end
 derivs.d2fc_dq=d2fc_dq;
+derivs.d2fc_dv=d2fc_dv;
 
 
 end

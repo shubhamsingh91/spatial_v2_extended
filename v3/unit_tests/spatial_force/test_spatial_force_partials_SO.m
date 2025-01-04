@@ -31,6 +31,7 @@ fprintf("model.NV = %d\n", model.NV)%
 [derivs] = spatial_force_SO_derivs(model, q, qd, qdd);
 
 d2fc_dq_algo = derivs.d2fc_dq;
+d2fc_dv_algo = derivs.d2fc_dv;
 
 
 %% complex-step- SO derivatives of spatial force/spatial cumulative force
@@ -146,6 +147,7 @@ for ii=1:N
                    d2fk_dvi_dvj = rotR(Tm(2*BIic_Si,Sj));
                
                   compare('(d2fk_dvi_dvj) case 1C'  , d2fk_dvi_dvj , d2fk_dvi_dvj_cs);                
+                  compare('(d2fk_dvi_dvj) case 1C-- algo'  , d2fk_dvi_dvj , d2fc_dv_algo{kk}(:,ii_vec,jj_vec));                
                      
                        %------- SO w.r.t v for Case 2C
                      [d2fk_dvj_dvi_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, kk , jj), ...
@@ -154,6 +156,7 @@ for ii=1:N
                     d2fk_dvj_dvi = rotR(d2fk_dvi_dvj);
                
                     compare('(d2fk_dvj_dvi) case 2C'  , d2fk_dvj_dvi , d2fk_dvj_dvi_cs);           
+                    compare('(d2fk_dvj_dvi) case 2C -- algo'  , d2fk_dvj_dvi , d2fc_dv_algo{kk}(:,jj_vec,ii_vec));           
                     
                  %------- SO a/q Case 2B j !=i
                 
@@ -201,6 +204,7 @@ for ii=1:N
                     d2fk_dvi_dvj = rotR(Tm (cmf_barM(ICi*Si)+ Tm(cmfM(Si),ICi) ,Sj));
                
                     compare('(d2fk_dvi_dvj) case D'  , d2fk_dvi_dvj , d2fk_dvi_dvj_cs);     
+                    compare('(d2fk_dvi_dvj) case D -- algo'  , d2fk_dvi_dvj , d2fc_dv_algo{kk}(:,ii_vec,jj_vec));     
                         
                     end
  
@@ -212,6 +216,7 @@ for ii=1:N
                 d2fi_dvj_dvk = rotR(Tm(2*BIic_Sj,Sk));
                
                 compare('(d2fi_dvj_dvk)'  , d2fi_dvj_dvk , d2fi_dvj_dvk_cs);
+                compare('(d2fi_dvj_dvk) - algo'  , d2fi_dvj_dvk , d2fc_dv_algo{ii}(:,jj_vec,kk_vec));
                 
                 %--------- SO derivs w.r.t v case 2A
                       
@@ -221,7 +226,8 @@ for ii=1:N
                 d2fi_dvk_dvj = rotR(d2fi_dvj_dvk);
                
                 compare('(d2fi_dvk_dvj)'  , d2fi_dvk_dvj , d2fi_dvk_dvj_cs);
-                
+                compare('(d2fi_dvk_dvj) -- algo'  , d2fi_dvk_dvj , d2fc_dv_algo{ii}(:,kk_vec,jj_vec));
+
                 %------- SO a/q Case 1B
                 
                 [d2fi_dak_dqj_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
@@ -252,6 +258,7 @@ for ii=1:N
             
                 d2fi_dvj_dvk = rotR(Tm( Tm(cmfM(Sj),ICi)+cmf_barM(ICi*Sj), Sk));
                   compare('(d2fi_dvk_dvj) Case B'  , d2fi_dvj_dvk , d2fi_dvj_dvk_cs);
+                  compare('(d2fi_dvk_dvj) Case B -- algo'  , d2fi_dvj_dvk , d2fc_dv_algo{ii}(:,kk_vec,jj_vec));
                   
                 end
                 
@@ -288,7 +295,8 @@ for ii=1:N
                 d2fj_dvk_dvi = 2*Tm(BIic_Si,Sk);
                
                 compare('(d2fj_dvk_dvi)'  , d2fj_dvk_dvi , d2fj_dvk_dvi_cs);
-    
+                compare('(d2fj_dvk_dvi) -- algo'  , d2fj_dvk_dvi , d2fc_dv_algo{jj}(:,kk_vec,ii_vec));
+
                 %----- SO v case 2E
                 [d2fj_dvi_dvk_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, jj , ii), ...
                 zeros(model.NV,1), ii, kk);
@@ -296,6 +304,7 @@ for ii=1:N
                 d2fj_dvi_dvk = rotR(d2fj_dvk_dvi);
                
                 compare('(d2fj_dvi_dvk)'  , d2fj_dvi_dvk , d2fj_dvi_dvk_cs);
+                compare('(d2fj_dvi_dvk) -- algo'  , d2fj_dvi_dvk , d2fc_dv_algo{jj}(:,ii_vec,kk_vec));
                 
                 %------- SO a/q Case 2A
                 
