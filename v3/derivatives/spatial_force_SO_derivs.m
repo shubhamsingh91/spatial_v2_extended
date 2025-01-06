@@ -149,7 +149,7 @@ for i = model.NB:-1:1
                                    d2fc_dav{k}(:,ii(p),jj(t)) = crf(S_t)*ICi*S_p;
                                    
                                    % expr-6 SO-av
-                                   d2fc_dav{k}(:,jj(r),ii(p)) = dot(ICi,S_p)*S_t;
+                                   d2fc_dav{k}(:,jj(t),ii(p)) = dot(ICi,S_p)*S_t;
 
 
                                   else % kk < j = i
