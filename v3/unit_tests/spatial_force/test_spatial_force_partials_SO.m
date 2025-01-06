@@ -190,7 +190,8 @@ for ii=1:N
                 d2fk_dvi_dqj = rotR(Tm(2*BIic_Si,psidj)+ Tm(cmf_barM(2*BCi*Si + ICi*(psidi+Sdi)),Sj));
                 
                 compare('(d2fk_dvi_dqj) case 2B'  , d2fk_dvi_dqj , d2fk_dvi_dqj_cs);
-                
+                compare('(d2fk_dvi_dqj) case 2B-- algo'  , d2fk_dvi_dqj , d2fc_dvq_algo{kk}(:,ii_vec,jj_vec));
+
                   %------- SO v/q Case 2C
                 
                 [d2fk_dvj_dqi_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
@@ -253,7 +254,8 @@ for ii=1:N
                             Tm(Tm(cmfM(Sj),ICi) - mT(ICi,crmM(Sj))  ,psidk+Sdk);
                 
                 compare('(d2fi_dvk_dqj) case 1B'  , d2fi_dvk_dqj , d2fi_dvk_dqj_cs);
-                
+                compare('(d2fi_dvk_dqj) case 1B -- algo'  , d2fi_dvk_dqj , d2fc_dvq_algo{ii}(:,kk_vec,jj_vec));
+
                 
                 else % k=j<=i
                  %--------- SO derivs w.r.t v case B
