@@ -87,7 +87,9 @@ for i = model.NB:-1:1
                          
                         S_r    = S{k}(:,r);    Sd_r   = Sd{k}(:,r);
                         psid_r = psid{k}(:,r); psidd_r = psidd{k}(:,r);
-                        
+            
+                        Bic_psikr_dot = 2*factorFunctions(IC{i} ,psid_r);
+      
                         % expr-1 SO-q
                         d2fc_dq{i}(:,jj(t),kk(r)) =  (Bic_psijt_dot +dot(BCi,S_t))*psid_r ...
                                                          +dot(ICi,S_t)*psidd_r + ...
@@ -95,6 +97,10 @@ for i = model.NB:-1:1
                             
                         % expr-1 SO-av
                         d2fc_dav{i}(:,jj(t),kk(r)) = crf(S_r)*ICi*S_t;
+                        
+                        % expr-1 SO-vq
+                        d2fc_dvq{i}(:,jj(t),kk(r)) = (Bic_psikr_dot + crf(S_r)*BCi+2*ICi*crm(psid_r))*S_t+...
+                                                    crf(S_r)*(ICi*(psid_t+Sd_t));
 
                             if (j~=i)  % kk <= j < i
                                % expr-5 SO-q
@@ -116,7 +122,10 @@ for i = model.NB:-1:1
                                % expr-5 SO-av
                                d2fc_dav{j}(:,kk(r),ii(p)) = dot(ICi,S_p)*S_r;
 
-                               
+                                % expr-2 SO-vq
+                                d2fc_dvq{j}(:,ii(p),kk(r)) = (Bic_psikr_dot + crf(S_r)*BCi+2*ICi*crm(psid_r))*S_p+...
+                                                              crf(S_r)*(ICi*(psid_p+Sd_p));
+
                             end
 
                              if (k~=j) % kk < j <= i
