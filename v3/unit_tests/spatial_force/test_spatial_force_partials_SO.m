@@ -3,7 +3,7 @@ clc; clear all;
 % run([pwd,'\..\startup.m'])
 % Testing the SO partials of spatial force
 
-N = 7;
+N = 17;
 
 % Create a random model with N links
 model = autoTree(N, 2, pi/3);
@@ -201,7 +201,8 @@ for ii=1:N
                             Tm(Tm(cmfM(Si),ICi) - mT(ICi,crmM(Si))  ,psidj+Sdj);
                 
                 compare('(d2fk_dvj_dqi) case 2C'  , d2fk_dvj_dqi , d2fk_dvj_dqi_cs);
-                
+                compare('(d2fk_dvj_dqi) case 2C -- algo'  , d2fk_dvj_dqi , d2fc_dvq_algo{kk}(:,jj_vec,ii_vec));
+
                     else % k < j = i
                         
                      [d2fk_dvi_dvj_cs] = complexStepForce_SOv(model, @(x) spatial_force_derivatives(model, q ,x ,qdd, kk , ii), ...
@@ -355,6 +356,8 @@ for ii=1:N
                             Tm(Tm(cmfM(Si),ICi) - mT(ICi,crmM(Si))  ,psidk+Sdk);
                 
                 compare('(d2fj_dvk_dqi) case 1C'  , d2fj_dvk_dqi , d2fj_dvk_dqi_cs);
+                compare('(d2fj_dvk_dqi) case 1C -- algo'  , d2fj_dvk_dqi , d2fc_dvq_algo{jj}(:,kk_vec,ii_vec));
+
                 end
                 
             % SO-a 

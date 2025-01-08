@@ -126,6 +126,9 @@ for i = model.NB:-1:1
                                 d2fc_dvq{j}(:,ii(p),kk(r)) = (Bic_psikr_dot + crf(S_r)*BCi+2*ICi*crm(psid_r))*S_p+...
                                                               crf(S_r)*(ICi*(psid_p+Sd_p));
                                 % expr-5 SO-vq
+                                d2fc_dvq{j}(:,kk(r),ii(p)) = (Bic_psii_dot + dot(BCi,S_p))*S_r +...
+                                                            dot(ICi,S_p)*(psid_r+Sd_r);
+                                
                             end
 
                              if (k~=j) % kk < j <= i
@@ -168,6 +171,10 @@ for i = model.NB:-1:1
                                   % expr-4 SO-vq
                                    d2fc_dvq{k}(:,ii(p),jj(t)) = Bic_phii*psid_t + ...
                                                                 crf_bar(BCi*S_p+ ICi*(psid_p+Sd_p))*S_t;
+                                  
+                                  % expr-6 SO-vq
+                                    d2fc_dvq{k}(:,jj(t),ii(p)) = (Bic_psii_dot + dot(BCi,S_p))*S_t +...
+                                                            dot(ICi,S_p)*(psid_t+Sd_t);
                                   
                                   else % kk < j = i
                                    % expr- 6 SO-v
