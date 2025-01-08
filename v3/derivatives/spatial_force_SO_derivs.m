@@ -125,7 +125,7 @@ for i = model.NB:-1:1
                                 % expr-2 SO-vq
                                 d2fc_dvq{j}(:,ii(p),kk(r)) = (Bic_psikr_dot + crf(S_r)*BCi+2*ICi*crm(psid_r))*S_p+...
                                                               crf(S_r)*(ICi*(psid_p+Sd_p));
-
+                                % expr-5 SO-vq
                             end
 
                              if (k~=j) % kk < j <= i
