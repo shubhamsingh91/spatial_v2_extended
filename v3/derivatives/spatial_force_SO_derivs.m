@@ -64,8 +64,12 @@ for i = 1:model.NB
     % Allocate partial derivatives
     d2fc_dq{i}  = zeros(6, model.NV, model.NV);
     d2fc_dv{i}  = zeros(6, model.NV, model.NV);
-    d2fc_dav{i} = zeros(6, model.NV, model.NV);
+    d2fc_daq{i} = zeros(6, model.NV, model.NV);
+    d2fc_dqa{i} = zeros(6, model.NV, model.NV);
     d2fc_dvq{i} = zeros(6, model.NV, model.NV);
+    d2fc_dva{i} = zeros(6, model.NV, model.NV);
+    d2fc_dav{i} = zeros(6, model.NV, model.NV);
+
 end
 
 % -------------------------------------------------------------------------
@@ -133,19 +137,19 @@ for i = model.NB:-1:1
                 
                 crfSt = crf(S_t);
                 
-                tmp1 = psid_t + Sd_t;
-                tmp2 = BCi*psid_t + ICi*psidd_t +  fCi_bar * S_t;
-                tmp3 = Bic_psijt_dot + BCi_St;
-                tmp4 = ICi*S_t;
-                tmp5 = ICi*tmp1;
-                tmp6 = u3*psid_t + ICi_Sp*psidd_t+ crfSt*u5;
-                tmp8 = Bic_phii*S_t;
-                tmp9 = crfSt*u2;
-                tmp10 = ICi_Sp * S_t;
-                tmp11 = Bic_phii*psid_t + u7*S_t;
-                tmp12 = u3*S_t + ICi_Sp*tmp1;
-                tmp13 = u8 * S_t;
-                tmp14 = crfSt*ICi + crf_bar(tmp4);
+                s1 = psid_t + Sd_t;
+                s2 = BCi*psid_t + ICi*psidd_t +  fCi_bar * S_t;
+                s3 = Bic_psijt_dot + BCi_St;
+                s4 = ICi*S_t;
+                s5 = ICi*s1;
+                s6 = u3*psid_t + ICi_Sp*psidd_t+ crfSt*u5;
+                s7 = Bic_phii*S_t;
+                s8 = crfSt*u2;
+                s9 = ICi_Sp * S_t;
+                s10 = Bic_phii*psid_t + u7*S_t;
+                s11 = u3*S_t + ICi_Sp*s1;
+                s12 = u8 * S_t;
+                s13 = crfSt*ICi + crf_bar(s4);
 
                 k = j;
                 while k > 0
@@ -169,18 +173,18 @@ for i = model.NB:-1:1
                         % expr-1 SO-q
                         % ----------------------------------------------------------------
                         % d2fc_dq{i}(:, jj(t), kk(r))
-                        d2fc_dq{i}(:, jj(t), kk(r)) =  tmp3*psid_r  + ICi_St*psidd_r + crfSr*tmp2;
+                        d2fc_dq{i}(:, jj(t), kk(r)) =  s3*psid_r  + ICi_St*psidd_r + crfSr*s2;
 
                         % ----------------------------------------------------------------
                         % expr-1 SO-av
                         % ----------------------------------------------------------------
-                        d2fc_dav{i}(:, jj(t), kk(r)) = crfSr * tmp4;
+                        d2fc_daq{i}(:, jj(t), kk(r)) = crfSr * s4;
 
                         % ----------------------------------------------------------------
                         % expr-1 SO-vq
                         % ----------------------------------------------------------------
                         d2fc_dvq{i}(:, jj(t), kk(r)) =(Bic_psikr_dot + crfSr*BCi + 2*ICi*crmPsidr)*S_t ...
-                            + crfSr*tmp5;
+                            + crfSr*s5;
 
                         % ================================================================
                         % if j ~= i => "off-diagonal" blocks
@@ -199,11 +203,11 @@ for i = model.NB:-1:1
                             d2fc_dv{j}(:, ii(p), kk(r)) = d2fc_dv{j}(:, kk(r), ii(p));
 
                             % expr-2 SO-av
-                            d2fc_dav{j}(:, ii(p), kk(r)) = crfSr * u2;
+                            d2fc_daq{j}(:, ii(p), kk(r)) = crfSr * u2;
 
                             % expr-5 SO-av
                             % d2fc_dav{j}(:, kk(r), ii(p))
-                            d2fc_dav{j}(:, kk(r), ii(p)) = ICi_Sp * S_r;
+                            d2fc_daq{j}(:, kk(r), ii(p)) = ICi_Sp * S_r;
 
                             % expr-2 SO-vq
                             d2fc_dvq{j}(:, ii(p), kk(r)) = ...
@@ -224,7 +228,7 @@ for i = model.NB:-1:1
 
                             % expr-3 SO-q
                             % d2fc_dq{k}(:, ii(p), jj(t))
-                            d2fc_dq{k}(:, ii(p), jj(t)) = tmp6;
+                            d2fc_dq{k}(:, ii(p), jj(t)) = s6;
 
                             % expr-1 SO-v
                             d2fc_dv{i}(:, jj(t), kk(r)) = Bic_phij*S_r;
@@ -232,10 +236,10 @@ for i = model.NB:-1:1
                             d2fc_dv{i}(:, kk(r), jj(t)) = d2fc_dv{i}(:, jj(t), kk(r));
 
                             % expr-3 SO-av
-                            d2fc_dav{i}(:, kk(r), jj(t)) = ICi_St * S_r;
+                            d2fc_daq{i}(:, kk(r), jj(t)) = ICi_St * S_r;
 
                             % expr-3 SO-vq
-                            d2fc_dvq{i}(:, kk(r), jj(t)) =  tmp3*S_r ...
+                            d2fc_dvq{i}(:, kk(r), jj(t)) =  s3*S_r ...
                                 + ICi_St*(psid_r + Sd_r);
 
                             % ------------------------------------------------------------
@@ -247,33 +251,33 @@ for i = model.NB:-1:1
                                     d2fc_dq{k}(:, ii(p), jj(t));
 
                                 % expr-4 SO-v
-                                d2fc_dv{k}(:, ii(p), jj(t)) = tmp8;
+                                d2fc_dv{k}(:, ii(p), jj(t)) = s7;
                                 % expr-5 SO-v
                                 d2fc_dv{k}(:, jj(t), ii(p)) = ...
                                     d2fc_dv{k}(:, ii(p), jj(t));
 
                                 % expr-4 SO-av
-                                d2fc_dav{k}(:, ii(p), jj(t)) = tmp9;
+                                d2fc_daq{k}(:, ii(p), jj(t)) = s8;
 
                                 % expr-6 SO-av
-                                d2fc_dav{k}(:, jj(t), ii(p)) = tmp10;
+                                d2fc_daq{k}(:, jj(t), ii(p)) = s9;
 
                                 % expr-4 SO-vq
-                                d2fc_dvq{k}(:, ii(p), jj(t)) = tmp11;
+                                d2fc_dvq{k}(:, ii(p), jj(t)) = s10;
                                 
                                 % expr-6 SO-vq
-                                d2fc_dvq{k}(:, jj(t), ii(p)) =  tmp12;
+                                d2fc_dvq{k}(:, jj(t), ii(p)) =  s11;
 
                             else
                                 % (kk < j = i)
                                 % expr-6 SO-v
-                                d2fc_dv{k}(:, ii(p), jj(t)) = tmp13;
+                                d2fc_dv{k}(:, ii(p), jj(t)) = s12;
                             end
 
                         else
                             % (k == j => kk == jj(t))
                             % expr-3 SO-v
-                            d2fc_dv{i}(:, jj(t), kk(r)) = tmp14 * S_r;
+                            d2fc_dv{i}(:, jj(t), kk(r)) = s13 * S_r;
                         end
 
                     end
@@ -283,7 +287,9 @@ for i = model.NB:-1:1
             j = model.parent(j);
         end
     end
-
+    
+    d2fc_dqa{i} = rotR(d2fc_daq{i});
+    
     % Accumulate to parent
     if model.parent(i) > 0
         p = model.parent(i);
@@ -296,8 +302,11 @@ end
 % Output partials
 derivs.d2fc_dq  = d2fc_dq;
 derivs.d2fc_dv  = d2fc_dv;
-derivs.d2fc_dav = d2fc_dav;
+derivs.d2fc_daq = d2fc_daq;
+derivs.d2fc_dqa = d2fc_dqa;
 derivs.d2fc_dvq = d2fc_dvq;
+derivs.d2fc_dav = d2fc_dav;
+derivs.d2fc_dva = d2fc_dva;
 
 end % main function
 
