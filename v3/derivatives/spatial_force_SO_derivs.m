@@ -241,7 +241,13 @@ for i = model.NB:-1:1
                             % expr-3 SO-vq
                             d2fc_dvq{i}(:, kk(r), jj(t)) =  s3*S_r ...
                                 + ICi_St*(psid_r + Sd_r);
+                            
+                            % expr-4 SO-aq
+                            d2fc_daq{k}(:, ii(p), jj(t)) = s8;
 
+                            % expr-4 SO-vq
+                            d2fc_dvq{k}(:, ii(p), jj(t)) = s10;
+                                
                             % ------------------------------------------------------------
                             % if (j ~= i) => (kk < j < i)
                             % ------------------------------------------------------------
@@ -256,14 +262,9 @@ for i = model.NB:-1:1
                                 d2fc_dv{k}(:, jj(t), ii(p)) = ...
                                     d2fc_dv{k}(:, ii(p), jj(t));
 
-                                % expr-4 SO-av
-                                d2fc_daq{k}(:, ii(p), jj(t)) = s8;
 
                                 % expr-6 SO-av
                                 d2fc_daq{k}(:, jj(t), ii(p)) = s9;
-
-                                % expr-4 SO-vq
-                                d2fc_dvq{k}(:, ii(p), jj(t)) = s10;
                                 
                                 % expr-6 SO-vq
                                 d2fc_dvq{k}(:, jj(t), ii(p)) =  s11;
