@@ -61,7 +61,9 @@ for ind=1:nj
     glob.dvi_dqj_cs = imag(glob_cs{ind}.v{index_ii})/step;
     
     glob.diX0_dqj_cs =  imag(glob_cs{ind}.iXO{index_ii})/step;
-    
+    glob.doXi_dqj_cs =  imag(glob_cs{ind}.OXi{index_ii})/step;
+    glob.doXiT_dqj_cs =  imag(glob_cs{ind}.OXiT{index_ii})/step;
+
     % body coordinates
     bod.dSi_dqj_cs(:,:,ind) = imag(bod_cs{ind}.S{index_ii})/step;
     bod.dSdi_dqj_cs(:,:,ind) = imag(bod_cs{ind}.Sd{index_ii})/step;
@@ -75,7 +77,7 @@ for ind=1:nj
     bod.dpsiddi_dqj_cs(:,:,ind) = imag(bod_cs{ind}.psidd{index_ii})/step;
 %     bod.dBCi_dqj_cs(:,:,ind) = imag(bod_cs{ind}.BC{index_ii})/step;
     bod.dfi_dqj_cs(:,ind) = imag(bod_cs{ind}.f{index_ii})/step;
-%     bod.dfCi_dqj_cs(:,ind) = imag(bod_cs{ind}.fC{index_ii})/step;
+    bod.dfCi_dqj_cs(:,ind) = imag(bod_cs{ind}.fC{index_ii})/step;
     bod.dSiT_dqj_cs(:,:,ind) = imag(bod_cs{ind}.S{index_ii}.')/step;
 %     bod.dvi_dqj_cs = imag(bod_cs{ind}.v{index_ii})/step;
 

@@ -150,7 +150,7 @@ for ii=1:N
                     compare('(d2fk_dai_dqj) case 2B --algo'  , d2fk_dai_dqj , d2fc_daq_algo{kk}(:,ii_vec,jj_vec));                    
 
           
-                    %------- SO v/q Case 2B
+                    %--te----- SO v/q Case 2B
 
                     [d2fk_dvi_dqj_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
                     zeros(model.NV,1), ii, jj);

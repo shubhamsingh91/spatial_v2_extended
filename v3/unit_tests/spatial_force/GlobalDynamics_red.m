@@ -53,17 +53,25 @@ for i = 1:model.NB
   psidb{i} =X_m_0{i}*psid{i};
   Sdb{i} =  X_m_0{i}*Sd{i};
   vb{i} =   X_m_0{i}*v{i};
-  vJxSb{i}=X_m_0{i}*vJxS{i};
+  vJxSb{i}= X_m_0{i}*vJxS{i};
   psiddb{i} =X_m_0{i}*psidd{i};
   Ib{i} =   model.I{i};
   ab{i} =   X_m_0{i}*a{i};
-  Iab{i} =   X_m_0{i}*Ia{i};
-  fb{i} =   X_m_0{i}*f{i};  % is this the correct transform?
+  Iab{i} =  X_m_0{i}*Ia{i};
+  fb{i} =   inv(X_m_0{i}.')*f{i};  % Correct Transform
+  
+  assert(all(abs(inv(X_m_0{i}.') - (inv(X_m_0{i}).')) < 1e-10, 'all'), ...
+  'The two matrices are not equal within numerical precision.');
 
+   assert(all(abs(inv(X_m_0{i}.') - (X_0_m{i}.')) < 1e-10, 'all'), ...
+  'The two matrices are not equal within numerical precision.');
+   X_0_mT{i} = X_0_m{i}.';
 end
 
 glob.B = BC;  % B(I,v) 
 glob.f = f;  % fi
+
+bod.f = fb; % body frame spatial force
 
 for i = model.NB:-1:1
     
@@ -72,18 +80,21 @@ for i = model.NB:-1:1
      IC{p} = IC{p} + IC{i};
      BC{p} = BC{p} + BC{i};
      f{p}  = f{p}  + f{i};
-
+     
+     % cumulative spatial force in body-frame
+     fb{p} = fb{p} + Xup{i}.'*fb{i};
   end 
     
 end
-
+ 
 for i=1:model.NB
     
     ICb{i} =  X_m_0{i}*IC{i}* X_0_m{i};
-       fCb{i} =  X_0_m{i}*f{i};
- 
+    fCb{i} =  inv(X_m_0{i}.')*f{i};
+%     disp(fCb{i} - fb{i})
 end
 
+ bod.fC = fCb;
 
   % glob coordinates
   glob.S = S;           glob.Sd = Sd;      glob.psid = psid;
@@ -93,13 +104,14 @@ end
   glob.Ia = Ia;
   glob.iXO = X_m_0; 
   glob.OXi = X_0_m;
-  
+  glob.OXiT = X_0_mT;
+
   % body coordinates
   bod.S = Sb;  bod.Sd = Sdb;    bod.psid = psidb;
   bod.v = vb;  bod.vJxS = vJxSb; bod.psidd = psiddb;
   bod.I = Ib;  bod.a = ab;% bod.BC = BCb;    
-  bod.IC = ICb;  bod.f = fb;
-  bod.Ia = Iab;
+  bod.IC = ICb;  
+  bod.Ia = Iab;  
    
 %   bod.X = 
 %   bod.Sd = Sd;      bod.psid = psid;
