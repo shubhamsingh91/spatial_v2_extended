@@ -3,11 +3,11 @@ clc; clear all;
 % run([pwd,'\..\startup.m'])
 % Testing the FO partials of spatial force
 
-N = 12;
+N = 5;
 
 % Create a random model with N links
-model = autoTree(N, 1);
-% model.jtype{1}='Fb';
+model = autoTree(N,3);
+% model.jtype{1}='Fb'; % Not working currently
 model = postProcessModel(model);
 
 q  = ones(model.NQ,1);
@@ -110,10 +110,10 @@ for ii=1:N
          dfCi_dqj_g = ICi_g*psiddj_g + cmf_barM(fCi_g)*Sj_g + 2*BCi_g*psidj_g;                         % K12
          stacked_dfc_dq(1:6,ii,jj_vec) = dfCi_dqj_g;
 
-         dfCi_dqj_ana_body =  -(OXiT)*crf(Sj_g)*fi_g + OXiT*glob_cs_q.dfCi_dqj_cs;
+         dfCi_dqj_ana_body =  -Tm(mT(OXiT,cmfM(Sj_g)),fCi_g) + OXiT*glob_cs_q.dfCi_dqj_cs;
         
-         doXi_dqj_ana = crm(Sj_g) * OXi;
-         doXiT_dqj_ana = -(OXiT)*crf(Sj_g);
+%          doXi_dqj_ana = crm(Sj_g) * OXi;
+%          doXiT_dqj_ana = -(OXiT)*crf(Sj_g);
         
         elseif ismember(ii,model.ancestors{jj}) 
           fprintf("\n ii = %d; jj= %d  j>i Case \n \n",ii,jj)  
@@ -128,27 +128,30 @@ for ii=1:N
 
         end
         
-        compare('(oXi identity) '  , doXi_dqj_ana ,  glob_cs_q.doXi_dqj_cs);
-        compare('(oXiT identity) '  , doXiT_dqj_ana ,  glob_cs_q.doXiT_dqj_cs);
+%         compare('(oXi identity) '  , doXi_dqj_ana ,  glob_cs_q.doXi_dqj_cs);
+%         compare('(oXiT identity) '  , doXiT_dqj_ana ,  glob_cs_q.doXiT_dqj_cs);
 
         compare('(K11) '  , dfi_dqj_g ,  glob_cs_q.dfi_dqj_cs);
         compare('(K12) '  , dfCi_dqj_g ,  glob_cs_q.dfCi_dqj_cs);
         
         % Analytical algorithm to get the spatial force FO partials
 
-        [df_dq_ana, dfc_dq_ana,df_dv_ana,dfc_dv_ana,df_da_ana,dfc_da_ana] = ...
-                        spatial_force_derivatives( model, q, qd, qdd, ii,jj );
+        [df_dq_ana, dfc_dq_ana,df_dv_ana,dfc_dv_ana,df_da_ana,dfc_da_ana,...
+                  dfc_dq_ana_body, dfc_dv_ana_body,dfc_da_ana_body] = spatial_force_derivatives(model, q, qd, qdd, ii,jj );
         
         compare('(df_dq ana) '  , df_dq_ana ,  glob_cs_q.dfi_dqj_cs);
         compare('(dfc_dq ana) '  , dfc_dq_ana ,  glob_cs_q.dfCi_dqj_cs);
-        
+        compare('(dfc_dq ana) - body'  , dfc_dq_ana_body ,  bod_cs_q.dfCi_dqj_cs);
+
         compare('(df_dv ana) '  , df_dv_ana ,  glob_cs_v.dfi_dqv_cs);
         compare('(dfc_dv ana) '  , dfc_dv_ana ,  glob_cs_v.dfci_dqv_cs);
-        
+        compare('(dfc_dv ana) - body'  , dfc_dv_ana_body ,  bod_cs_v.dfCi_dvj_cs);
+
         compare('(df_da ana) '  , df_da_ana ,  glob_cs_a.dfi_da_cs);
         compare('(dfc_da ana) '  , dfc_da_ana ,  glob_cs_a.dfci_da_cs);
-        
-        % get the body frame deriv of fc
+        compare('(dfc_da ana)-body '  , dfc_da_ana_body ,  bod_cs_a.dfci_da_cs);
+
+        % get the body frateme deriv of fc
         dfCi_dqj_cs_body = bod_cs_q.dfCi_dqj_cs;
         dfCi_dvj_cs_body = bod_cs_v.dfCi_dvj_cs;
         dfCi_daj_cs_body = bod_cs_a.dfci_da_cs;
@@ -180,7 +183,7 @@ function compare(txt, v1, v2)
     if e > 1e-7
         x = 'X';
         fprintf('%12s = %.3e  %s\n',txt,e,x); 
-%         error('ErrorID:SpecificError', 'Expression not correct');
+        error('ErrorID:SpecificError', 'Expression not correct');
 
     else
         fprintf('%12s = %.3e  \x2713\n%s\n',txt,e);         

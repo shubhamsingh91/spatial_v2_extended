@@ -41,8 +41,10 @@ for i = 1:model.NB
         v{i}     = zeros(6,1);
         a{i}     = -a_grav;
         Xup0{i}  = Xup{i};
+        X_0_m{i} = inv(Xup{i});
     else
         Xup0{i}  = Xup{i} * Xup0{model.parent(i)};
+        X_0_m{i} = X_0_m{model.parent(i)}*inv(Xup{i});
         v{i}     = v{model.parent(i)};
         a{i}     = a{model.parent(i)};
     end
@@ -70,6 +72,13 @@ for i = 1:model.NB
     d2fc_dva{i} = zeros(6, model.NV, model.NV);
     d2fc_dav{i} = zeros(6, model.NV, model.NV);
 
+    d2fc_dq_b{i}  = zeros(6, model.NV, model.NV);
+    d2fc_dv_b{i}  = zeros(6, model.NV, model.NV);
+    d2fc_daq_b{i} = zeros(6, model.NV, model.NV);
+    d2fc_dqa_b{i} = zeros(6, model.NV, model.NV);
+    d2fc_dvq_b{i} = zeros(6, model.NV, model.NV);
+    d2fc_dva_b{i} = zeros(6, model.NV, model.NV);
+    d2fc_dav_b{i} = zeros(6, model.NV, model.NV);    
 end
 
 % -------------------------------------------------------------------------
@@ -199,9 +208,13 @@ for i = model.NB:-1:1
 
                             % expr-7 SO-v
                             d2fc_dv{j}(:, kk(r), ii(p)) = Bic_phii*S_r;
+                            %body frame derivs
+                            d2fc_dv_b{j}(:, kk(r), ii(p)) = X_0_m{j}.'*d2fc_dv{j}(:, kk(r), ii(p));
+                       
                             % expr-8 SO-v
                             d2fc_dv{j}(:, ii(p), kk(r)) = d2fc_dv{j}(:, kk(r), ii(p));
-
+                            d2fc_dv_b{j}(:, ii(p), kk(r)) = X_0_m{j}.'*d2fc_dv{j}(:, kk(r), ii(p));
+                             
                             % expr-2 SO-av
                             d2fc_daq{j}(:, ii(p), kk(r)) = crfSr * u2;
 
@@ -232,8 +245,11 @@ for i = model.NB:-1:1
 
                             % expr-1 SO-v
                             d2fc_dv{i}(:, jj(t), kk(r)) = Bic_phij*S_r;
+                            d2fc_dv_b{i}(:, jj(t), kk(r)) = X_0_m{i}.'*d2fc_dv{i}(:, jj(t), kk(r));
+
                             % expr-2 SO-v
                             d2fc_dv{i}(:, kk(r), jj(t)) = d2fc_dv{i}(:, jj(t), kk(r));
+                            d2fc_dv_b{i}(:, kk(r), jj(t)) =  X_0_m{i}.'*d2fc_dv{i}(:, jj(t), kk(r));
 
                             % expr-3 SO-av
                             d2fc_daq{i}(:, kk(r), jj(t)) = ICi_St * S_r;
@@ -258,9 +274,12 @@ for i = model.NB:-1:1
 
                                 % expr-4 SO-v
                                 d2fc_dv{k}(:, ii(p), jj(t)) = s7;
+                                d2fc_dv_b{k}(:, ii(p), jj(t)) =  X_0_m{k}.'* d2fc_dv{k}(:, ii(p), jj(t));
+                                
                                 % expr-5 SO-v
                                 d2fc_dv{k}(:, jj(t), ii(p)) = ...
                                     d2fc_dv{k}(:, ii(p), jj(t));
+                                d2fc_dv_b{k}(:, jj(t), ii(p)) =  X_0_m{k}.'* d2fc_dv{k}(:, jj(t), ii(p));
 
 
                                 % expr-6 SO-av
@@ -273,14 +292,20 @@ for i = model.NB:-1:1
                                 % (kk < j = i)
                                 % expr-6 SO-v
                                 d2fc_dv{k}(:, ii(p), jj(t)) = s12;
+                                d2fc_dv_b{k}(:, ii(p), jj(t)) =  X_0_m{k}.'* d2fc_dv{k}(:, ii(p), jj(t));
+
                             end
 
                         else
                             % (k == j => kk == jj(t))
                             % expr-3 SO-v
                             d2fc_dv{i}(:, jj(t), kk(r)) = s13 * S_r;
-                        end
+                            d2fc_dv_b{i}(:, jj(t), kk(r)) =  X_0_m{i}.'* d2fc_dv{i}(:,  jj(t), kk(r));
 
+                        end
+                        
+
+                        
                     end
                     k = model.parent(k);
                 end
@@ -308,6 +333,14 @@ derivs.d2fc_dqa = d2fc_dqa;
 derivs.d2fc_dvq = d2fc_dvq;
 derivs.d2fc_dav = d2fc_dav;
 derivs.d2fc_dva = d2fc_dva;
+
+derivs.d2fc_dq_b  = d2fc_dq_b;
+derivs.d2fc_dv_b  = d2fc_dv_b;
+derivs.d2fc_daq_b = d2fc_daq_b;
+derivs.d2fc_dqa_b = d2fc_dqa_b;
+derivs.d2fc_dvq_b = d2fc_dvq_b;
+derivs.d2fc_dav_b = d2fc_dav_b;
+derivs.d2fc_dva_b = d2fc_dva_b;
 
 end % main function
 
