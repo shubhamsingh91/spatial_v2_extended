@@ -38,7 +38,10 @@ d2fc_dvq_algo = derivs.d2fc_dvq;
 d2fc_dva_algo = derivs.d2fc_dva;
 d2fc_dav_algo = derivs.d2fc_dav;
 
+d2fc_dq_algo_b = derivs.d2fc_dq;
 d2fc_dv_algo_b = derivs.d2fc_dv_b;
+d2fc_dvq_algo_b = derivs.d2fc_dvq_b;
+d2fc_daq_algo_b = derivs.d2fc_daq_b;
 
 %% complex-step- SO derivatives of spatial force/spatial cumulative force
 step=1e-20; % step size for complex-step
@@ -88,18 +91,19 @@ for ii=1:N
                 
                 compare('(d2fic_dqj_dqk)'  , d2fi_dqj_dqk , d2fi_dqj_dqk_cs);
                 compare('(d2fic_dqj_dqk-- algo)'  , d2fi_dqj_dqk , d2fc_dq_algo{ii}(1:6,jj_vec,kk_vec));
-%                 compare('(d2fic_dqj_dqk) - body'  , d2fi_dqj_dqk , d2fi_dqj_dqk_cs);
+%                 compare('(d2fic_dqj_dqk) - body'  , d2fi_dqj_dqk_cs_body ,  d2fc_dq_algo_b{ii}(1:6,jj_vec,kk_vec));
 
                 %------- SO a/q Case 1A
                 
-                [d2fi_daj_dqk_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
+                [d2fi_daj_dqk_cs,d2fi_daj_dqk_cs_b] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
                 zeros(model.NV,1), jj, kk);
                                          
                 d2fi_daj_dqk = Tm(Tm(cmfM(Sk),ICi) , Sj);
                 
                 compare('(d2fic_daj_dqk) case 1A'  , d2fi_daj_dqk , d2fi_daj_dqk_cs);               
                 compare('(d2fic_daj_dqk) case 1A - algo'  , d2fi_daj_dqk , d2fc_daq_algo{ii}(:,jj_vec,kk_vec));               
-                
+                compare('(d2fic_daj_dqk) case 1A - algo --body'  , d2fi_daj_dqk_cs_b , d2fc_daq_algo_b{ii}(:,jj_vec,kk_vec));               
+              
                 %------- SO q/a Case 1A
                 [d2fi_dqj_dak_cs] = complexStepForce_SOqa(model, @(x) spatial_force_derivatives(model, q ,qd ,x, ii , jj), ...
                 zeros(model.NV,1), jj, kk);
@@ -107,7 +111,7 @@ for ii=1:N
 
                 %------- SO v/q Case 1A
                 
-                [d2fi_dvj_dqk_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
+                [d2fi_dvj_dqk_cs,d2fi_dvj_dqk_cs_b] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , jj), ...
                 zeros(model.NV,1), jj, kk);
                                          
                  
@@ -116,6 +120,7 @@ for ii=1:N
                 
                 compare('(d2fi_dvj_dqk) case 1A'  , d2fi_dvj_dqk , d2fi_dvj_dqk_cs);
                 compare('(d2fi_dvj_dqk) case 1A -- algo'  , d2fi_dvj_dqk , d2fc_dvq_algo{ii}(:,jj_vec,kk_vec));
+                compare('(d2fi_dvj_dqk) case 1A -- algo --body'  , d2fi_dvj_dqk_cs_b , d2fc_dvq_algo_b{ii}(:,jj_vec,kk_vec));
 
                 if kk~=jj  % k<j<=i                                                                                           % k<j<= i
           
@@ -143,7 +148,7 @@ for ii=1:N
                      
                      %------- SO a/q Case 2B j !=i
 
-                    [d2fk_dai_dqj_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
+                    [d2fk_dai_dqj_cs,d2fk_dai_dqj_cs_b] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
                     zeros(model.NV,1), ii, jj);
 
 
@@ -151,17 +156,20 @@ for ii=1:N
 
                     compare('(d2fk_dai_dqj) case 2B'  , d2fk_dai_dqj , d2fk_dai_dqj_cs); 
                     compare('(d2fk_dai_dqj) case 2B --algo'  , d2fk_dai_dqj , d2fc_daq_algo{kk}(:,ii_vec,jj_vec));                    
+                    compare('(d2fk_dai_dqj) case 2B --algo --body'  , d2fk_dai_dqj_cs_b , d2fc_daq_algo_b{kk}(:,ii_vec,jj_vec));                    
 
           
                     %--te----- SO v/q Case 2B
 
-                    [d2fk_dvi_dqj_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
+                    [d2fk_dvi_dqj_cs,d2fk_dvi_dqj_cs_b] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , ii), ...
                     zeros(model.NV,1), ii, jj);
 
                     d2fk_dvi_dqj = rotR(Tm(2*BIic_Si,psidj)+ Tm(cmf_barM(2*BCi*Si + ICi*(psidi+Sdi)),Sj));
 
                     compare('(d2fk_dvi_dqj) case 2B'  , d2fk_dvi_dqj , d2fk_dvi_dqj_cs);
                     compare('(d2fk_dvi_dqj) case 2B-- algo'  , d2fk_dvi_dqj , d2fc_dvq_algo{kk}(:,ii_vec,jj_vec));
+                    compare('(d2fk_dvi_dqj) case 2B-- algo--body'  , d2fk_dvi_dqj_cs_b , d2fc_dvq_algo_b{kk}(:,ii_vec,jj_vec));
+
                     %------------------------
                     if jj~=ii   % k < j < i 
                         
@@ -202,13 +210,14 @@ for ii=1:N
 
                %------- SO a/q Case 2C
                 
-                [d2fk_daj_dqi_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
+                [d2fk_daj_dqi_cs,d2fk_daj_dqi_cs_body] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
                 zeros(model.NV,1), jj, ii);
                                          
                 d2fk_daj_dqi = Tm(Tm(cmfM(Si),ICi) - mT(ICi,crmM(Si)), Sj);
                 
                 compare('(d2fk_daj_dqi) Case 2C'  , d2fk_daj_dqi , d2fk_daj_dqi_cs); 
                 compare('(d2fk_daj_dqi) Case 2C -- algo'  , d2fk_daj_dqi , d2fc_daq_algo{kk}(:,jj_vec,ii_vec)); 
+                compare('(d2fk_daj_dqi) Case 2C -- algo --body'  , d2fk_daj_dqi_cs_body , d2fc_daq_algo_b{kk}(:,jj_vec,ii_vec)); 
 
                 %------- SO q/a Case 2C
                 [d2fk_dqj_dai_cs] = complexStepForce_SOqa(model, @(x) spatial_force_derivatives(model, q ,qd ,x, kk , jj), ...
@@ -219,7 +228,7 @@ for ii=1:N
 
                   %------- SO v/q Case 2C
                 
-                [d2fk_dvj_dqi_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
+                [d2fk_dvj_dqi_cs,d2fk_dvj_dqi_cs_b] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, kk , jj), ...
                 zeros(model.NV,1), jj, ii);
                                          
                 d2fk_dvj_dqi = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi)- mT(BCi,crmM(Si)), Sj) +...
@@ -227,6 +236,7 @@ for ii=1:N
                 
                 compare('(d2fk_dvj_dqi) case 2C'  , d2fk_dvj_dqi , d2fk_dvj_dqi_cs);
                 compare('(d2fk_dvj_dqi) case 2C -- algo'  , d2fk_dvj_dqi , d2fc_dvq_algo{kk}(:,jj_vec,ii_vec));
+                compare('(d2fk_dvj_dqi) case 2C -- algo --body'  , d2fk_dvj_dqi_cs_b , d2fc_dvq_algo_b{kk}(:,jj_vec,ii_vec));
 
                     else % k < j = i
                         
@@ -265,13 +275,14 @@ for ii=1:N
 
                 %------- SO a/q Case 1B
                 
-                [d2fi_dak_dqj_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
+                [d2fi_dak_dqj_cs,d2fi_dak_dqj_cs_b] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
                 zeros(model.NV,1), kk, jj);
                                          
                 d2fi_dak_dqj = Tm(Tm(cmfM(Sj),ICi) - mT(ICi,crmM(Sj)) , Sk);
                 
                 compare('(d2fi_dak_dqj) case 1A'  , d2fi_dak_dqj , d2fi_dak_dqj_cs);
                 compare('(d2fi_dak_dqj) case 1A -- algo'  , d2fi_dak_dqj , d2fc_daq_algo{ii}(:,kk_vec,jj_vec));
+                compare('(d2fi_dak_dqj) case 1A -- algo --body'  , d2fi_dak_dqj_cs_b , d2fc_daq_algo_b{ii}(:,kk_vec,jj_vec));
 
                %------- SO q/a Case 1B
                 [d2fi_dqk_daj_cs] = complexStepForce_SOqa(model, @(x) spatial_force_derivatives(model, q ,qd ,x, ii , kk), ...
@@ -281,15 +292,15 @@ for ii=1:N
 
                %------- SO v/q Case 1B
                 
-                [d2fi_dvk_dqj_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
+                [d2fi_dvk_dqj_cs,d2fi_dvk_dqj_cs_b] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, ii , kk), ...
                 zeros(model.NV,1), kk, jj);
                                          
-                 
                 d2fi_dvk_dqj = 2*Tm(BIic_psidj + Tm(cmfM(Sj),BCi)- mT(BCi,crmM(Sj)), Sk) +...
                             Tm(Tm(cmfM(Sj),ICi) - mT(ICi,crmM(Sj))  ,psidk+Sdk);
                 
                 compare('(d2fi_dvk_dqj) case 1B'  , d2fi_dvk_dqj , d2fi_dvk_dqj_cs);
                 compare('(d2fi_dvk_dqj) case 1B -- algo'  , d2fi_dvk_dqj , d2fc_dvq_algo{ii}(:,kk_vec,jj_vec));
+                compare('(d2fi_dvk_dqj) case 1B -- algo --body'  , d2fi_dvk_dqj_cs_b , d2fc_dvq_algo_b{ii}(:,kk_vec,jj_vec));
 
                 
                 else % k=j<=i
@@ -308,7 +319,7 @@ for ii=1:N
                 %-----
                 if jj~= ii % kk <= jj < ii
                     
-                [d2fj_dqk_dqi_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , kk), ...
+                [d2fj_dqk_dqi_cs,d2fj_dqk_dqi_cs_body] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , kk), ...
                         zeros(model.NV,1), kk, ii);
                     
                     
@@ -320,6 +331,7 @@ for ii=1:N
                  d2fj_dqk_dqi = temp1 + temp2;                   
                       compare('(d2fj_dqk_dqi)'  , d2fj_dqk_dqi , d2fj_dqk_dqi_cs);
                       compare('(d2fj_dqk_dqi)-- algo'  , d2fj_dqk_dqi , d2fc_dq_algo{jj}(1:6,kk_vec,ii_vec));
+                      compare('(d2fj_dqk_dqi)-- algo --body'  , d2fj_dqk_dqi_cs_body , d2fc_dq_algo_b{jj}(1:6,kk_vec,ii_vec));
 
                 %-----
                 [d2fj_dqi_dqk_cs] = complexStepForce(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
@@ -353,14 +365,15 @@ for ii=1:N
                 
                 %------- SO a/q Case 2A
                 
-                [d2fj_dai_dqk_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
+                [d2fj_dai_dqk_cs,d2fj_dai_dqk_cs_b] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
                 zeros(model.NV,1), ii, kk);
                                          
                 d2fj_dai_dqk = Tm(Tm(cmfM(Sk),ICi) , Si);
                 
                 compare('(d2fj_dai_dqk) Case 2A'  , d2fj_dai_dqk , d2fj_dai_dqk_cs);               
                 compare('(d2fj_dai_dqk) Case 2A -- algo'  , d2fj_dai_dqk , d2fc_daq_algo{jj}(:,ii_vec,kk_vec));               
-              
+                compare('(d2fj_dai_dqk) Case 2A -- algo --body'  , d2fj_dai_dqk_cs_b , d2fc_daq_algo_b{jj}(:,ii_vec,kk_vec));               
+             
                 %------- SO q/a Case 2A
                 [d2fj_dqi_dak_cs] = complexStepForce_SOqa(model, @(x) spatial_force_derivatives(model, q ,qd ,x, jj , ii), ...
                 zeros(model.NV,1), ii, kk);
@@ -370,14 +383,15 @@ for ii=1:N
                  
                %------- SO a/q Case 1C
                 
-                [d2fj_dak_dqi_cs] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , kk), ...
+                [d2fj_dak_dqi_cs,d2fj_dak_dqi_cs_b] = complexStepForce_SOaq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , kk), ...
                 zeros(model.NV,1), kk, ii);
                                          
                 d2fj_dak_dqi = Tm(Tm(cmfM(Si),ICi) - mT(ICi,crmM(Si)), Sk);
                 
                 compare('(d2fj_dak_dqi) Case 2A'  , d2fj_dak_dqi , d2fj_dak_dqi_cs); 
                 compare('(d2fj_dak_dqi) Case 2A-- algo'  , d2fj_dak_dqi , d2fc_daq_algo{jj}(:,kk_vec,ii_vec)); 
-                
+                compare('(d2fj_dak_dqi) Case 2A-- algo --body'  , d2fj_dak_dqi_cs_b , d2fc_daq_algo_b{jj}(:,kk_vec,ii_vec)); 
+              
                %------- SO q/a Case 1C
                 [d2fj_dqk_dai_cs] = complexStepForce_SOqa(model, @(x) spatial_force_derivatives(model,q ,qd ,x, jj , kk), ...
                 zeros(model.NV,1), kk, ii);
@@ -387,7 +401,7 @@ for ii=1:N
             
               %------- SO v/q Case 2A
                 
-                [d2fj_jdvi_dqk_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
+                [d2fj_jdvi_dqk_cs,d2fj_jdvi_dqk_cs_b] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , ii), ...
                 zeros(model.NV,1), ii, kk);
                                          
                  
@@ -396,10 +410,11 @@ for ii=1:N
                 
                 compare('(d2fj_dvi_dqk) case 2A'  , d2fj_dvi_dqk , d2fj_jdvi_dqk_cs);
                 compare('(d2fj_dvi_dqk) case 2A -- algo'  , d2fj_dvi_dqk , d2fc_dvq_algo{jj}(:,ii_vec,kk_vec));
+                compare('(d2fj_dvi_dqk) case 2A -- algo --body'  , d2fj_jdvi_dqk_cs_b , d2fc_dvq_algo_b{jj}(:,ii_vec,kk_vec));
 
                %------- SO v/q Case 1C
                 
-                [d2fj_dvk_dqi_cs] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , kk), ...
+                [d2fj_dvk_dqi_cs,d2fj_dvk_dqi_cs_b] = complexStepForce_SOvq(model, @(x) spatial_force_derivatives(model, newConfig(x) ,qd ,qdd, jj , kk), ...
                 zeros(model.NV,1), kk, ii);
                                          
                 d2fj_dvk_dqi = 2*Tm(BIic_psidi + Tm(cmfM(Si),BCi)- mT(BCi,crmM(Si)), Sk) +...
@@ -407,6 +422,7 @@ for ii=1:N
                 
                 compare('(d2fj_dvk_dqi) case 1C'  , d2fj_dvk_dqi , d2fj_dvk_dqi_cs);
                 compare('(d2fj_dvk_dqi) case 1C -- algo'  , d2fj_dvk_dqi , d2fc_dvq_algo{jj}(:,kk_vec,ii_vec));
+                compare('(d2fj_dvk_dqi) case 1C -- algo --body'  , d2fj_dvk_dqi_cs_b , d2fc_dvq_algo_b{jj}(:,kk_vec,ii_vec));
 
                 end
                 
