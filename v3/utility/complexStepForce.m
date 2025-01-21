@@ -15,9 +15,10 @@ function [d2fc_dq_g,d2fc_dq_b] = complexStepForce(model, f, x, jj,kk, step)
         
        e = zeros(m,1);
        e(i+k_idx_begin-1) = 1;
-       [df_dq,dfci_dqj,df_dv,dfc_dv,df_da,dfc_da,dfci_dqj_body,dfc_dv_body,dfc_da_body]= f(x+1i*e*step);
+       [df_dq,dfci_dqj,df_dv,dfc_dv,df_da,dfc_da,dfci_dqj_body,dfc_dv_body,dfc_da_body]= ...
+                                f(x+1i*e*step);
        
-        d2fc_dq_g(:,:,i) = imag( dfci_dqj)/step;  % d2fci_dqj_dqk
+        d2fc_dq_g(:,:,i) = imag( dfci_dqj)/step;       % d2fci_dqj_dqk
         d2fc_dq_b(:,:,i) = imag( dfci_dqj_body)/step;  % d2fci_dqj_dqk
 
     end

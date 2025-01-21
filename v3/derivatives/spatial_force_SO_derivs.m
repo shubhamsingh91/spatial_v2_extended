@@ -185,10 +185,11 @@ for i = model.NB:-1:1
                         % d2fc_dq{i}(:, jj(t), kk(r))
                         d2fc_dq{i}(:, jj(t), kk(r)) =  s3*psid_r  + ICi_St*psidd_r + crfSr*s2;
                         
-                        SO_q =  d2fc_dq{i}(:, jj(t), kk(r));
-                        FO_q = ICi*psidd_t + fCi_bar*S_t + BCi*psid_t;
+                        FO_q_j = ICi*psidd_t + fCi_bar*S_t + BCi*psid_t;
+                        FO_q_k = ICi*psidd_r + fCi_bar*S_r + BCi*psid_r;
                         
-                        d2fc_dq_b{i}(:, jj(t), kk(r)) =  X_0_m{i}.'*(crfSt*crfSr*fCi - crfSt*FO_q-crfSr*FO_q+SO_q);
+                        d2fc_dq_b{i}(:, jj(t), kk(r)) =  X_0_m{i}.'*...
+                                (crfSt*crfSr*fCi - crfSt*FO_q_k-crfSr*FO_q_j+d2fc_dq{i}(:, jj(t), kk(r)));
 
                         % ----------------------------------------------------------------
                         % expr-1 SO-aq
@@ -219,6 +220,7 @@ for i = model.NB:-1:1
 
                             % expr-6 SO-q
                             d2fc_dq{j}(:, ii(p), kk(r)) = d2fc_dq{j}(:, kk(r), ii(p));
+                            d2fc_dq_b{j}(:, ii(p), kk(r)) = d2fc_dq_b{j}(:, kk(r), ii(p));
 
                             % expr-7 SO-v
                             d2fc_dv{j}(:, kk(r), ii(p)) = Bic_phii*S_r;
@@ -256,16 +258,18 @@ for i = model.NB:-1:1
                         end
 
                         % ================================================================
-                        % if (k ~= j) => fill cross terms (kk < j)
+                        % if (k ~= j) => fill cross terms (k < j <= i)
                         % ================================================================
                         if (k ~= j)
                             % expr-2 SO-q
                             d2fc_dq{i}(:, kk(r), jj(t)) = d2fc_dq{i}(:, jj(t), kk(r));
+                            d2fc_dq_b{i}(:, kk(r), jj(t)) = d2fc_dq_b{i}(:, jj(t), kk(r));
 
                             % expr-3 SO-q
                             % d2fc_dq{k}(:, ii(p), jj(t))
                             d2fc_dq{k}(:, ii(p), jj(t)) = s6;
-
+                            d2fc_dq_b{k}(:, ii(p), jj(t)) =  X_0_m{k}.'* d2fc_dq{k}(:, ii(p), jj(t));
+                            
                             % expr-1 SO-v
                             d2fc_dv{i}(:, jj(t), kk(r)) = Bic_phij*S_r;
                             d2fc_dv_b{i}(:, jj(t), kk(r)) = X_0_m{i}.'*d2fc_dv{i}(:, jj(t), kk(r));
@@ -300,8 +304,8 @@ for i = model.NB:-1:1
                             % ------------------------------------------------------------
                             if (j ~= i)
                                 % expr-4 SO-q
-                                d2fc_dq{k}(:, jj(t), ii(p)) = ...
-                                    d2fc_dq{k}(:, ii(p), jj(t));
+                                d2fc_dq{k}(:, jj(t), ii(p)) =  d2fc_dq{k}(:, ii(p), jj(t));
+                                d2fc_dq_b{k}(:, jj(t), ii(p)) =  d2fc_dq_b{k}(:, ii(p), jj(t));
 
                                 % expr-4 SO-v
                                 d2fc_dv{k}(:, ii(p), jj(t)) = s7;

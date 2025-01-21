@@ -137,7 +137,8 @@ for ii=1:N
         % Analytical algorithm to get the spatial force FO partials
 
         [df_dq_ana, dfc_dq_ana,df_dv_ana,dfc_dv_ana,df_da_ana,dfc_da_ana,...
-                  dfc_dq_ana_body, dfc_dv_ana_body,dfc_da_ana_body] = spatial_force_derivatives(model, q, qd, qdd, ii,jj );
+                  dfc_dq_ana_body, dfc_dv_ana_body,dfc_da_ana_body] = ...
+                    spatial_force_derivatives(model, q, qd, qdd, ii,jj );
         
         compare('(df_dq ana) '  , df_dq_ana ,  glob_cs_q.dfi_dqj_cs);
         compare('(dfc_dq ana) '  , dfc_dq_ana ,  glob_cs_q.dfCi_dqj_cs);
