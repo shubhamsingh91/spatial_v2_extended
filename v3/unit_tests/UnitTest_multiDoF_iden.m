@@ -55,7 +55,8 @@ for ii=1:model.NB
         Sdi_g = glob.Sd{ii};     Ii_g = glob.I{ii};        Iai_g = glob.Ia{ii};    psiddi_g = glob.psidd{ii};
         vJxSi_g = glob.vJxS{ii}; ICi_g = glob.IC{ii};      BCi_g = glob.BC{ii};    fCi_g = glob.fC{ii}; 
         fi_g = glob.f{ii};        Bi_g = glob.B{ii}; 
-        
+        oXi_g = glob.OXi{ii};
+
         Sj_g = glob.S{jj};       psidj_g = glob.psid{jj};  psiddj_g = glob.psidd{jj};  
         Sdj_g = glob.Sd{jj};     ICj_g = glob.IC{jj};      BCj_g = glob.BC{jj};
         fCj_g = glob.fC{jj};
@@ -87,6 +88,7 @@ for ii=1:model.NB
         dSiTf_dqj_g = zeros(ni,nj);     
         dxii_dqj_g = zeros(6,nj);     
         dgammai_dqj_g = zeros(6,nj);   
+        doXi_dqj_g = zeros(6,6,nj);
         
         dvi_dvj_g = zeros(6,nj);
         dxii_dvj_g = zeros(6,nj);
