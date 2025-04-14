@@ -45,7 +45,9 @@ for i = 1:nb
   len(i) = taper^(i-1);
   mass = taper^(3*(i-1));
   CoM = len(i) * [0.5,0,0];
-  Icm = mass * len(i)^2 * diag([0.0025,1.015/12,1.015/12]);
+  Icm = mass * len(i)^2 * diag([0.0,0.0,1.0]);
+%   Icm = mass * len(i)^2 * diag([0.0025,1.015/12,1.015/12]);
+
   model.I{i} = mcI( mass, CoM, Icm );
 end
 
