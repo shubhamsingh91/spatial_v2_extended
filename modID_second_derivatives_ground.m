@@ -108,7 +108,6 @@ for i = model.NB:-1:1
    
    H_qq(ii,:) = -S{i}'*(crf(vp{i})*dz_dq{i} + crf(ap{i})*dh_dq{i} + crf(wp{i})*df_dq{i} + ...
                         icrf(z{i})*dv_dq_p{i}+ icrf(h{i})*da_dq_p{i} + icrf(f{i})*dw_dq_p{i});                 
-   
                     
    p = model.parent(i);
    if p > 0

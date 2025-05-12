@@ -9,6 +9,8 @@ model = autoTree(N, 3, pi/3);
 model.jtype{1} = 'Fb';
 model.jtype{2} = 'Fb';
 
+model = autoTree(N, 1);
+
 model = postProcessModel(model);
 
 % Random configuration and velocity
@@ -18,12 +20,12 @@ q   = normalizeConfVec(model, q);
 qd  = ones(model.NV,1);
 qdd = ones(model.NV,1);
 lambda = ones(model.NV,1);
-mu = rand(model.NV,1);
+mu = ones(model.NV,1);
 newConfig = @(x) configurationAddition(model,q,x);
 
 %% Mod ID
 [tau]      = ID(model, q ,qd ,qdd);                    % Inverse dynamics
-out = modID( model, q, qd, qdd, lambda );               % modified inverse Dynamics
+out = modID( model, q, qd, qdd, lambda );              % modified inverse Dynamics
 
 checkValue('modID'   , out      , lambda.'*tau            ); % modID
 
@@ -64,18 +66,40 @@ dmodFD_dq_cs  = complexStepJacobian(@(x) modFD(model,  newConfig(x) ,qd ,tau,lam
 dmodFD_dqd_cs = complexStepJacobian(@(x) modFD(model, q ,x  ,tau,lambda), qd);
 dmodFD_dtau_cs = complexStepJacobian(@(x) modFD(model,q ,qd ,x ,lambda), tau);
 
-
 checkValue('modFD_q'   , dmodFD_dq      , dmodFD_dq_cs            ); % Partials of modFD w.r.t. q
 checkValue('modFD_qd'  , dmodFD_dqd     , dmodFD_dqd_cs           ); % Partials of modFD w.r.t. qd
 checkValue('modFD_tau' , dmodFD_dtau    , dmodFD_dtau_cs          ); % Partials of modFD w.r.t. qd
 
 %% Mod ID Derivs - SO
-derivs = modID_second_derivatives_ground( model, q, qd, qdd, lambda);
+derivs_ground = modID_second_derivatives_ground( model, q, qd, qdd, lambda);
+derivs = modID_second_derivatives( model, q, qd, qdd, lambda);
+ 
+ID_SO_q_ground = derivs_ground.dmod_dqq;
+ID_SO_v_ground = derivs_ground.dmod_dvv;
+ID_SO_qv_ground = derivs_ground.dmod_dqv;
 
 ID_SO_q = derivs.dmod_dqq;
 ID_SO_v = derivs.dmod_dvv;
 ID_SO_qv = derivs.dmod_dqv;
 
+% complex-step
+modID_cs_qq  = complexStepJacobian( @(x) outputSelect(1,@modID_derivatives_ground,...
+            model,x,qd,qdd,lambda),q );
+    
+modID_cs_vv = complexStepJacobian( @(x) outputSelect(2,@modID_derivatives_ground,...
+                model,q,x,qdd,lambda),qd );
+
+modID_cs_qv  = complexStepJacobian( @(x) outputSelect(2,@modID_derivatives_ground,...
+            model,x,qd,qdd,lambda),q );
+
+
+checkValue('modID_qq'   , ID_SO_q      , modID_cs_qq            ); % Partials of modID w.r.t. q
+checkValue('modID_vv'   , ID_SO_v      , modID_cs_vv            ); % Partials of modID w.r.t. v
+checkValue('modID_qv'   , ID_SO_qv      , modID_cs_qv            ); % Partials of modID w.r.t. q,v
+
+checkValue('modID_qq_ground'   , ID_SO_q_ground      , modID_cs_qq            ); % Partials of modID w.r.t. q
+checkValue('modID_vv_ground'   , ID_SO_v_ground      , modID_cs_vv            ); % Partials of modID w.r.t. v
+checkValue('modID_qv_ground'   , ID_SO_qv_ground      , modID_cs_qv            ); % Partials of modID w.r.t. q,v
 
 %% MoD FD Derivs - SO
 
