@@ -108,6 +108,10 @@ for i = model.NB:-1:1
    
    H_qq(ii,:) = -S{i}'*(crf(vp{i})*dz_dq{i} + crf(ap{i})*dh_dq{i} + crf(wp{i})*df_dq{i} + ...
                         icrf(z{i})*dv_dq_p{i}+ icrf(h{i})*da_dq_p{i} + icrf(f{i})*dw_dq_p{i});                 
+
+%    H_qddq(ii,:) = S{i}'*(dh_dq{i}-icrf(h{i})*dv_dq{i});
+      H_qddq(ii,:) = S{i}'*(dh_dq{i}-crm(S{i})*h{i});
+
                     
    p = model.parent(i);
    if p > 0
@@ -131,3 +135,4 @@ end
 derivs.dmod_dqq = H_qq;
 derivs.dmod_dvv = H_qdqd;
 derivs.dmod_dqv = H_qdq.';
+derivs.dmod_daq = H_qddq;
