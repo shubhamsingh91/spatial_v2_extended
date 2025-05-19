@@ -78,7 +78,7 @@ ID_SO_q_ground = derivs_ground.dmod_dqq;
 ID_SO_v_ground = derivs_ground.dmod_dvv;
 ID_SO_qv_ground = derivs_ground.dmod_dqv;
 ID_SO_vq_ground = ID_SO_qv_ground.';
-ID_SO_aq_ground = derivs_ground.dmod_daq;
+% ID_SO_aq_ground = derivs_ground.dmod_daq;
 
 ID_SO_q = derivs.dmod_dqq;
 ID_SO_v = derivs.dmod_dvv;
