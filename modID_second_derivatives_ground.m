@@ -51,6 +51,7 @@ vp = cell(NB,1);   ap  = cell(NB,1);   wp = cell(NB,1);
 h  = cell(NB,1);   z   = cell(NB,1);   f  = cell(NB,1);
 
 I = model.I;
+IC = model.I;
 
 % =========================================================================
 % 1) forward (outward) pass
@@ -62,39 +63,56 @@ for i = 1:NB
 
     % joint kinematics
     [XJ,S{i}] = jcalc(model.jtype{i},q{i});
-    vJ  = S{i}*qd{i};
-    wJ  = S{i}*lambda{i};
+
     Xup{i} = XJ * model.Xtree{i};
 
     if model.parent(i)==0                                     % ROOT
-        vp{i} = zeros(6,1);           wp{i} = zeros(6,1);
-        ap{i} = Xup{i} * (-a_grav);
+        vp{i} = zeros(6,1);          
+        wp{i} = zeros(6,1);
+        ap{i} =(-a_grav);
+        Xup0{i} = Xup{i}; % i_X_0
 
-        da_dq_p(:,c_ii) = crm(ap{i}) * S{i};
     else                                                       % CHILD
         p      = model.parent(i);
         idx_p  = col(p);
 
-        vp{i}  = Xup{i} * v{p};
-        wp{i}  = Xup{i} * w{p};
-        ap{i}  = Xup{i} * a{p};
+        Xup0{i} = Xup{i}*Xup0{model.parent(i)}; % i_X_0
+
+        vp{i}  =  v{p};
+        wp{i}  =  w{p};
+        ap{i}  =  a{p};
 
         % propagate derivatives from parent
-        dv_dq_p(:,idx_i)   = Xup{i} * dv_dq(:,idx_p);
-        da_dq_p(:,idx_i)   = Xup{i} * da_dq(:,idx_p);
-        dw_dq_p(:,idx_i)   = Xup{i} * dw_dq(:,idx_p);
-        dv_dqd_p(:,idx_i)  = Xup{i} * dv_dqd(:,idx_p);
+        dv_dq_p(:,idx_i)   =  dv_dq(:,idx_p);
+        da_dq_p(:,idx_i)   =  da_dq(:,idx_p);
+        dw_dq_p(:,idx_i)   =  dw_dq(:,idx_p);
+        dv_dqd_p(:,idx_i)  =  dv_dqd(:,idx_p);
 
-        % plus local contributions
+    end
+    
+    Xdown0{i} = inv(Xup0{i}); %0_X_i
+  
+    S{i} = Xdown0{i}*S{i}; %0_S_i
+    
+    if model.parent(i)==0
+        da_dq_p(:,c_ii) = crm(ap{i}) * S{i};
+    else
+         % plus local contributions
         dv_dq_p(:,c_ii) = crm(vp{i}) * S{i};
         da_dq_p(:,c_ii) = crm(ap{i}) * S{i};
         dw_dq_p(:,c_ii) = crm(wp{i}) * S{i};
     end
+        
+   
+    vJ  = S{i}*qd{i};
+    wJ  = S{i}*lambda{i};
 
     % spatial velocities / accelerations
     v{i} = vp{i} + vJ;
     a{i} = ap{i} + crm(v{i})*vJ + S{i}*qdd{i};
     w{i} = wp{i} + wJ;
+    
+    IC{i} = Xup0{i}.'*I{i}*Xup0{i};
 
     dv_dq(:,idx_i)  = dv_dq_p(:,idx_i);
 
@@ -106,23 +124,23 @@ for i = 1:NB
     dv_dqd(:,c_ii)  = S{i};
 
     % momentum-like terms
-    h{i}            = I{i} * w{i};
-    dh_dq(:,idx_i)  = I{i} * dw_dq(:,idx_i);
+    h{i}            = IC{i} * w{i};
+    dh_dq(:,idx_i)  = IC{i} * dw_dq(:,idx_i);
 
-    z{i}            = I{i}*crm(w{i})*v{i} - crf(w{i})*I{i}*v{i};
+    z{i}            = IC{i}*crm(w{i})*v{i} - crf(w{i})*IC{i}*v{i};
 
-    dz_dq(:,idx_i)  = I{i}*crm(w{i})*dv_dq(:,idx_i) ...
-                    - I{i}*crm(v{i})*dw_dq(:,idx_i) ...
-                    - crf(w{i})*I{i}*dv_dq(:,idx_i) ...
-                    - icrf(I{i}*v{i})*dw_dq(:,idx_i);
+    dz_dq(:,idx_i)  = IC{i}*crm(w{i})*dv_dq(:,idx_i) ...
+                    - IC{i}*crm(v{i})*dw_dq(:,idx_i) ...
+                    - crf(w{i})*IC{i}*dv_dq(:,idx_i) ...
+                    - icrf(IC{i}*v{i})*dw_dq(:,idx_i);
 
-    dz_dqd(:,idx_i) = I{i}*crm(w{i})*dv_dqd(:,idx_i) ...
-                    - crf(w{i})*I{i}*dv_dqd(:,idx_i);
+    dz_dqd(:,idx_i) = IC{i}*crm(w{i})*dv_dqd(:,idx_i) ...
+                    - crf(w{i})*IC{i}*dv_dqd(:,idx_i);
 
-    f{i}            = I{i}*a{i} + crf(v{i})*I{i}*v{i};
-    df_dq(:,idx_i)  = I{i}*da_dq(:,idx_i) ...
-                    + crf(v{i})*I{i}*dv_dq(:,idx_i) ...
-                    + icrf(I{i}*v{i})*dv_dq(:,idx_i);
+    f{i}            = IC{i}*a{i} + crf(v{i})*IC{i}*v{i};
+    df_dq(:,idx_i)  = IC{i}*da_dq(:,idx_i) ...
+                    + crf(v{i})*IC{i}*dv_dq(:,idx_i) ...
+                    + icrf(IC{i}*v{i})*dv_dq(:,idx_i);
 end
 
 % =========================================================================
@@ -157,25 +175,25 @@ for i = NB:-1:1
     if p > 0
         idx_p = col(p);
 
-        z{p}           = z{p} + Xup{i}' * z{i};
+        z{p}           = z{p} + z{i};
 
-        dz_dq(:,idx_p) = dz_dq(:,idx_p) + Xup{i}' * dz_dq(:,idx_i);
+        dz_dq(:,idx_p) = dz_dq(:,idx_p) + dz_dq(:,idx_i);
         dz_dq(:, (p-1)*NV + ii) = dz_dq(:, (p-1)*NV + ii) ...
-                                + Xup{i}' * icrf(z{i}) * S{i};
+                                +  icrf(z{i}) * S{i};
 
-        dz_dqd(:,idx_p) = dz_dqd(:,idx_p) + Xup{i}' * dz_dqd(:,idx_i);
+        dz_dqd(:,idx_p) = dz_dqd(:,idx_p) + dz_dqd(:,idx_i);
 
-        h{p}           = h{p} + Xup{i}' * h{i};
+        h{p}           = h{p} +  h{i};
 
-        dh_dq(:,idx_p) = dh_dq(:,idx_p) + Xup{i}' * dh_dq(:,idx_i);
+        dh_dq(:,idx_p) = dh_dq(:,idx_p) +  dh_dq(:,idx_i);
         dh_dq(:, (p-1)*NV + ii) = dh_dq(:, (p-1)*NV + ii) ...
-                                + Xup{i}' * icrf(h{i}) * S{i};
+                                + icrf(h{i}) * S{i};
 
-        f{p}           = f{p} + Xup{i}' * f{i};
+        f{p}           = f{p} +f{i};
 
-        df_dq(:,idx_p) = df_dq(:,idx_p) + Xup{i}' * df_dq(:,idx_i);
+        df_dq(:,idx_p) = df_dq(:,idx_p) + df_dq(:,idx_i);
         df_dq(:, (p-1)*NV + ii) = df_dq(:, (p-1)*NV + ii) ...
-                                + Xup{i}' * icrf(f{i}) * S{i};
+                                +  icrf(f{i}) * S{i};
     end
 end
 
