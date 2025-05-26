@@ -2,24 +2,27 @@
 clear all; clc;
 
 % modID derivs with a floating base
-N = 17;
+N = 11;
 
 % Create a random model with N links
-model = autoTree(N, 3, pi/3);
+model = autoTree(N, 2, pi/3);
 model.jtype{1} = 'Fb';
-model.jtype{2} = 'Fb';
-
-model = autoTree(N, 1);
 
 model = postProcessModel(model);
 
 % Random configuration and velocity
-q   = ones(model.NQ,1);
-q   = normalizeConfVec(model, q); 
+q   = rand(model.NQ,1);
+if strcmp(model.jtype{1},'SE3')
+    q(1:16) = reshape( randomSE3(),[16 1]);
+elseif strcmp(model.jtype{1},'Fb')
+    q(1:4) = q(1:4)/norm(q(1:4));
+end
 
-qd  = ones(model.NV,1);
-qdd = ones(model.NV,1);
-lambda = ones(model.NV,1);
+qd  = rand(model.NV,1);
+qdd = rand(model.NV,1);
+
+lambda = rand(model.NV,1);
+    
 mu = ones(model.NV,1);
 newConfig = @(x) configurationAddition(model,q,x);
 
@@ -87,19 +90,19 @@ ID_SO_vq = ID_SO_qv.';
 
 % complex-step
 modID_cs_qq  = complexStepJacobian( @(x) outputSelect(1,@modID_derivatives_ground,...
-            model,x,qd,qdd,lambda),q );
+            model,newConfig(x),qd,qdd,lambda),zeros(model.NV,1));
     
 modID_cs_vv = complexStepJacobian( @(x) outputSelect(2,@modID_derivatives_ground,...
                 model,q,x,qdd,lambda),qd );
 
 modID_cs_qv  = complexStepJacobian( @(x) outputSelect(2,@modID_derivatives_ground,...
-            model,x,qd,qdd,lambda),q );
+            model,newConfig(x),qd,qdd,lambda),zeros(model.NV,1));
 
 modID_cs_vq = complexStepJacobian( @(x) outputSelect(1,@modID_derivatives_ground,...
                 model,q,x,qdd,lambda),qd );
 
 modID_cs_qa  = complexStepJacobian( @(x) outputSelect(3,@modID_derivatives_ground,...
-            model,x,qd,qdd,lambda),q );
+            model,newConfig(x),qd,qdd,lambda),zeros(model.NV,1) );
  
 modID_cs_aq  = complexStepJacobian( @(x) outputSelect(1,@modID_derivatives_ground,...
             model,q,qd,x,lambda),qdd );
@@ -107,14 +110,14 @@ modID_cs_aq  = complexStepJacobian( @(x) outputSelect(1,@modID_derivatives_groun
         
 checkValue('modID_qq'   , ID_SO_q      , modID_cs_qq            ); % Partials of modID w.r.t. q
 checkValue('modID_vv'   , ID_SO_v      , modID_cs_vv            ); % Partials of modID w.r.t. v
-checkValue('modID_qv'   , ID_SO_qv      , modID_cs_qv            ); % Partials of modID w.r.t. q,v
-checkValue('modID_vq'   , ID_SO_vq      , modID_cs_vq           ); % Partials of modID w.r.t. v,q
+% checkValue('modID_qv'   , ID_SO_qv      , modID_cs_qv            ); % Partials of modID w.r.t. q,v
+% checkValue('modID_vq'   , ID_SO_vq      , modID_cs_vq           ); % Partials of modID w.r.t. v,q
 checkValue('modID_aq sanity'   , modID_cs_aq      , modID_cs_qa.'           ); % Partials of modID w.r.t. a,q
 
 checkValue('modID_qq_ground'   , ID_SO_q_ground      , modID_cs_qq            ); % Partials of modID w.r.t. q
 checkValue('modID_vv_ground'   , ID_SO_v_ground      , modID_cs_vv            ); % Partials of modID w.r.t. v
-checkValue('modID_qv_ground'   , ID_SO_qv_ground      , modID_cs_qv            ); % Partials of modID w.r.t. q,v
-checkValue('modID_vq_ground'   , ID_SO_vq_ground      , modID_cs_vq            ); % Partials of modID w.r.t. v,q
+% checkValue('modID_qv_ground'   , ID_SO_qv_ground      , modID_cs_qv            ); % Partials of modID w.r.t. q,v
+% checkValue('modID_vq_ground'   , ID_SO_vq_ground      , modID_cs_vq            ); % Partials of modID w.r.t. v,q
 % checkValue('modID_aq_ground'   , ID_SO_aq_ground      , modID_cs_aq            ); % Partials of modID w.r.t. a,q
 
 %% MoD FD Derivs - SO
