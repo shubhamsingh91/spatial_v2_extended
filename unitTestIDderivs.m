@@ -76,17 +76,26 @@ checkValue('modFD_tau' , dmodFD_dtau    , dmodFD_dtau_cs          ); % Partials 
 %% Mod ID Derivs - SO
 derivs_ground = modID_second_derivatives_ground( model, q, qd, qdd, lambda);
 derivs = modID_second_derivatives( model, q, qd, qdd, lambda);
- 
+derivs_soa = modID_second_derivatives_soa( model, q, qd, qdd, lambda);
+
+% ground algo
 ID_SO_q_ground = derivs_ground.dmod_dqq;
 ID_SO_v_ground = derivs_ground.dmod_dvv;
 ID_SO_qv_ground = derivs_ground.dmod_dqv.';
 ID_SO_vq_ground = ID_SO_qv_ground.';
 % ID_SO_aq_ground = derivs_ground.dmod_daq;
 
+% regular body frame algo
 ID_SO_q = derivs.dmod_dqq;
 ID_SO_v = derivs.dmod_dvv;
 ID_SO_qv = derivs.dmod_dqv.';
 ID_SO_vq = ID_SO_qv.';
+
+% Pat's soa ground frame algo
+ID_SO_q_soa = derivs_soa.dmod_dqq;
+ID_SO_v_soa = derivs_soa.dmod_dvv;
+ID_SO_qv_soa = derivs_soa.dmod_dqv.';
+ID_SO_vq_soa = ID_SO_qv_soa.';
 
 % first checking ground vs regular version
 
@@ -124,8 +133,13 @@ checkValue('modID_aq sanity'   , modID_cs_aq      , modID_cs_qa.'           ); %
 checkValue('modID_qq_ground'   , ID_SO_q_ground      , modID_cs_qq            ); % Partials of modID w.r.t. q
 checkValue('modID_vv_ground'   , ID_SO_v_ground      , modID_cs_vv            ); % Partials of modID w.r.t. v
 checkValue('modID_qv_ground'   , ID_SO_qv_ground      , modID_cs_qv            ); % Partials of modID w.r.t. q,v
-checkValue('modID_vq_ground'   , ID_SO_vq_ground      , modID_cs_vq            ); % Partials of modID w.r.t. v,q
+checkValue('modID_vq_ground'   , ID_SO_vq_ground      , modID_cs_vq            ); % Partials of modID w.r.t. v,q 
 % checkValue('modID_aq_ground'   , ID_SO_aq_ground      , modID_cs_aq            ); % Partials of modID w.r.t. a,q
+
+checkValue('modID_qq_soa'   , ID_SO_q_ground      , ID_SO_q_soa            ); % Partials of modID w.r.t. q
+checkValue('modID_vv_soa'   , ID_SO_v_ground      , ID_SO_v_soa            ); % Partials of modID w.r.t. v
+checkValue('modID_qv_soa'   , ID_SO_qv_ground      , ID_SO_qv_soa            ); % Partials of modID w.r.t. q,v
+checkValue('modID_vq_soa'   , ID_SO_vq_ground      , ID_SO_vq_soa            ); % Partials of modID w.r.t. v,q 
 
 %% MoD FD Derivs - SO
 
